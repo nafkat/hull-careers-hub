@@ -362,3 +362,115 @@
   }
 
 }
+
+/* ── industrial metal plate kit ───────────────────────────── */
+
+@utility metal-plate {
+  background-color: var(--navy-card);
+  border: 2px solid var(--steel-raw);
+  border-radius: 4px;
+  box-shadow: var(--shadow-card);
+}
+
+@utility plate-hover {
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+  &:hover {
+    border-color: var(--poppy);
+    transform: translateY(-4px);
+    box-shadow:
+      0 10px 30px -10px color-mix(in oklab, var(--poppy) 55%, transparent),
+      var(--shadow-card);
+  }
+}
+
+@utility stamp {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 10px;
+  padding: 4px 10px;
+  border: 1px solid color-mix(in oklab, var(--steel-raw) 90%, transparent);
+  background-color: color-mix(in oklab, white 4%, transparent);
+  border-radius: 2px;
+}
+
+@utility hero-title {
+  font-family: var(--font-display);
+  letter-spacing: 10px;
+  line-height: 0.95;
+  text-shadow:
+    0 0 24px color-mix(in oklab, var(--poppy) 55%, transparent),
+    0 0 70px color-mix(in oklab, var(--poppy) 35%, transparent);
+}
+
+@utility beam-layer {
+  background-image: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    color-mix(in oklab, var(--weld) 12%, transparent) 12deg,
+    transparent 30deg,
+    transparent 170deg,
+    color-mix(in oklab, var(--poppy) 10%, transparent) 186deg,
+    transparent 205deg,
+    transparent 360deg
+  );
+  animation: beam-rotate 25s linear infinite;
+}
+
+@utility dust-dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background-color: color-mix(in oklab, var(--fog) 70%, transparent);
+  animation: dust-float 15s ease-in-out infinite;
+}
+
+@utility weld-underline {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--weld), transparent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  &:hover::after {
+    opacity: 1;
+    animation: weld-flash 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes beam-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dust-float {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  10%,
+  85% {
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate3d(18px, -60px, 0);
+  }
+  100% {
+    transform: translate3d(-10px, -130px, 0);
+    opacity: 0;
+  }
+}
