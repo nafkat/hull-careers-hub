@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, Ship, Waves, Wrench } from "lucide-react";
 import { listActiveJobs } from "@/lib/jobs.functions";
 import { JobCard } from "@/components/job-card";
-import { OceanBackdrop } from "@/components/ocean-backdrop";
+import { Rivets, SparkBurst, YardAtmosphere } from "@/components/industrial";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
 
