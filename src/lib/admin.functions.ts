@@ -45,6 +45,24 @@ export type AdminSettings = {
   rate_limit_per_day: number;
 };
 
+export type SocialPostOutcome = {
+  network: string;
+  posted: boolean;
+  mocked: boolean;
+  error: string | null;
+};
+
+export type SocialPostRow = {
+  id: string;
+  job_listing_id: string | null;
+  job_title: string;
+  platform: string;
+  status: string;
+  post_url: string | null;
+  error_message: string | null;
+  created_at: string;
+};
+
 const jobSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().trim().min(2).max(150),
