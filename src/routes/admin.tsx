@@ -251,6 +251,8 @@ function AdminConsole() {
                       >
                         {job.status}
                       </span>
+                    </TableCell>
+
 
                     <TableCell className="hidden text-muted-foreground lg:table-cell">
                       {job.social_auto_post ? "On" : "Off"}
