@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, MapPin, Clock, Building2 } from "lucide-react";
-import { departmentAccent, getJobBySlug } from "@/data/jobs";
+import { departmentAccent } from "@/data/departments";
+import { getActiveJob } from "@/lib/jobs.functions";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
 import { ApplyModal } from "@/components/apply-modal";
 
 export const Route = createFileRoute("/jobs/$slug")({
-  loader: ({ params }) => {
-    const job = getJobBySlug(params.slug);
+  loader: async ({ params }) => {
+    const { job } = await getActiveJob({ data: { slug: params.slug } });
     if (!job) throw notFound();
     return { job };
   },
