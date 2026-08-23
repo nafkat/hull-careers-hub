@@ -101,7 +101,22 @@ export function JobEditor({
         toast.error(result.message ?? "Could not save the job");
         return;
       }
-      toast.success(result.socialPosted ? "Job published and shared to socials" : "Job saved");
+      const results = result.socialResults ?? [];
+      if (results.length > 0) {
+        const label = (network: string) =>
+          `${network.charAt(0).toUpperCase()}${network.slice(1)}`;
+        const summary = results
+          .map((entry) => `${label(entry.network)} ${entry.posted ? "✓" : "✗"}`)
+          .join(", ");
+        const allPosted = results.every((entry) => entry.posted);
+        if (allPosted) {
+          toast.success(`Job published and shared to: ${summary}`);
+        } else {
+          toast.warning(`Job published. Social posts: ${summary}`);
+        }
+      } else {
+        toast.success("Job saved");
+      }
       queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
       onOpenChange(false);
     },
