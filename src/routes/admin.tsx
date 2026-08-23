@@ -76,39 +76,53 @@ function PasswordGate() {
   });
 
   return (
-    <div className="grid min-h-screen place-items-center px-5">
+    <div className="grid-bg grid min-h-screen place-items-center px-5">
       <form
-        className="glass page-enter w-full max-w-sm space-y-5 rounded-xl p-8"
+        className="metal-plate page-enter relative w-full max-w-sm space-y-6 p-8"
         onSubmit={(event) => {
           event.preventDefault();
           mutation.mutate();
         }}
       >
+        <Rivets />
         <div className="flex flex-col items-center gap-3 text-center">
-          <Anchor className="size-8 text-gold" />
-          <h1 className="font-display text-3xl">EUROHULL Admin</h1>
-          <p className="text-sm text-muted-foreground">Restricted to yard recruitment staff.</p>
+          <Anchor className="size-8 text-primary" />
+          <h1 className="font-display text-[32px] tracking-[4px]">EUROHULL ADMIN</h1>
+          <p className="font-mono text-[11px] tracking-[2px] text-muted-foreground uppercase">
+            Restricted to yard recruitment staff
+          </p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password" className="font-mono text-[11px] tracking-[2px] uppercase">
+            Password
+          </Label>
           <Input
             id="password"
             type="password"
             autoComplete="current-password"
+            className="industrial-input px-0"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
         </div>
-        <Button type="submit" variant="rust" className="w-full" disabled={mutation.isPending}>
+        <Button
+          type="submit"
+          className="w-full rounded-[2px] bg-primary font-mono tracking-[3px] text-primary-foreground uppercase hover:bg-primary/90"
+          disabled={mutation.isPending}
+        >
           {mutation.isPending ? "Checking…" : "Enter"}
         </Button>
-        <Link to="/" className="block text-center text-xs text-muted-foreground hover:text-gold">
+        <Link
+          to="/"
+          className="block text-center font-mono text-[10px] tracking-[2px] text-muted-foreground uppercase hover:text-primary"
+        >
           Back to careers site
         </Link>
       </form>
     </div>
   );
 }
+
 
 function AdminConsole() {
   const queryClient = useQueryClient();
