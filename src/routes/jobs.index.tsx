@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { activeJobs } from "@/data/jobs";
+import { listActiveJobs } from "@/lib/jobs.functions";
 import { JobCard } from "@/components/job-card";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 
 export const Route = createFileRoute("/jobs/")({
+  loader: () => listActiveJobs(),
   head: () => ({
     meta: [
       { title: "Open Roles at EUROHULL Shipyards" },
