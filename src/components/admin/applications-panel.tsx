@@ -149,7 +149,7 @@ export function ApplicationsPanel({
           placeholder="Search by name or email"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 shadow-none focus-visible:border-primary focus-visible:ring-0 max-w-xs"
+          className="!rounded-none !border-0 !border-b-2 !border-steel !bg-transparent px-0 !shadow-none focus-visible:!border-primary focus-visible:!ring-0 max-w-xs"
         />
         <Select value={scanFilter} onValueChange={setScanFilter}>
           <SelectTrigger className="w-44">
