@@ -134,7 +134,7 @@
       color-mix(in oklab, var(--poppy) 16%, transparent),
       transparent 60%
     ),
-    linear-gradient(180deg, #0d2murky, #0b1f3a);
+    linear-gradient(180deg, #132a49, #0b1f3a);
   --gradient-gold: linear-gradient(100deg, var(--weld), #ffa26b);
   --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.03);
   --shadow-glow-gold: 0 0 0 1px color-mix(in oklab, var(--weld) 40%, transparent),
