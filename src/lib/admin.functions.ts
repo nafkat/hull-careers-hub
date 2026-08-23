@@ -161,8 +161,17 @@ export const saveJob = createServerFn({ method: "POST" })
     }
 
     let socialPosted = false;
+    let socialResults: SocialPostOutcome[] = [];
     const becameActive = data.status === "active" && previousStatus !== "active";
     if (becameActive && data.social_auto_post) {
+      const { getRequest } = await import("@tanstack/react-start/server");
+      let origin: string | null = null;
+      try {
+        origin = new URL(getRequest().url).origin;
+      } catch {
+        origin = null;
+      }
+
       const { data: settings } = await supabaseAdmin
         .from("app_settings")
         .select("social_api_keys")
@@ -175,10 +184,18 @@ export const saveJob = createServerFn({ method: "POST" })
         .maybeSingle();
       const results = await postJobToSocials({
         title: data.title,
+        department: data.department,
         location: data.location,
-        url: `https://eurohull.com/jobs/${job?.slug ?? ""}`,
+        url: `${origin ?? "https://eurohull.com"}/jobs/${job?.slug ?? ""}`,
         keys: (settings?.social_api_keys ?? {}) as Record<string, string | undefined>,
+        origin,
       });
+      socialResults = results.map((result) => ({
+        network: result.network,
+        posted: result.posted,
+        mocked: result.mocked,
+        error: result.error ?? null,
+      }));
 
       await supabaseAdmin.from("social_posts").insert(
         results.map((result) => ({
