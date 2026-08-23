@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import type { PublicJob } from "@/lib/jobs.functions";
 import { submitApplication } from "@/lib/applications.functions";
+import { Rivets } from "@/components/industrial";
 import { cn } from "@/lib/utils";
 
 const MAX_FILE_MB = 10;
@@ -197,7 +198,8 @@ export function ApplyModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="glass max-h-[90vh] overflow-y-auto border-border/60 sm:max-w-lg">
+      <DialogContent className="metal-plate relative max-h-[90vh] overflow-y-auto sm:max-w-lg">
+        <Rivets />
         {stage === "success" ? (
           <SuccessScreen jobTitle={job.title} onClose={() => handleOpenChange(false)} />
         ) : stage === "infected" ? (
@@ -231,13 +233,13 @@ export function ApplyModal({
               </>
             ) : (
               <>
-                <div className="relative grid size-16 place-items-center">
-                  <Shield className="size-12 text-gold" />
-                  <span className="absolute inset-0 overflow-hidden rounded-full">
-                    <span className="absolute inset-y-0 w-1/3 animate-sweep bg-gold/25 blur-md" />
-                  </span>
+                <div className="relative grid size-24 place-items-center">
+                  <span className="absolute inset-0 rounded-full border border-primary/30" />
+                  <span className="absolute inset-3 rounded-full border border-primary/20" />
+                  <span className="absolute inset-0 animate-radar rounded-full [background:conic-gradient(from_0deg,color-mix(in_oklab,var(--poppy)_45%,transparent),transparent_90deg)]" />
+                  <Shield className="relative size-10 text-primary" />
                 </div>
-                <p className="font-display text-xl">Scanning file…</p>
+                <p className="font-display text-xl tracking-[3px] uppercase">Scanning file…</p>
                 <p className="text-sm text-muted-foreground">
                   Checking {file?.name} for threats.
                 </p>
@@ -254,9 +256,9 @@ export function ApplyModal({
             </DialogHeader>
 
             <div className="space-y-2">
-              <Label htmlFor="fullName">Full name *</Label>
+              <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="fullName">Full name *</Label>
               <Input
-                id="fullName"
+                id="fullName" className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                 value={fullName}
                 maxLength={100}
                 onChange={(e) => setFullName(e.target.value)}
@@ -269,9 +271,9 @@ export function ApplyModal({
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="email">Email *</Label>
                 <Input
-                  id="email"
+                  id="email" className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                   type="email"
                   value={email}
                   maxLength={255}
@@ -283,9 +285,9 @@ export function ApplyModal({
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
+                <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="phone">Phone</Label>
                 <Input
-                  id="phone"
+                  id="phone" className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                   value={phone}
                   maxLength={40}
                   onChange={(e) => setPhone(e.target.value)}
@@ -295,9 +297,9 @@ export function ApplyModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cover">Cover message</Label>
+              <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="cover">Cover message</Label>
               <Textarea
-                id="cover"
+                id="cover" className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                 value={coverMessage}
                 maxLength={500}
                 rows={4}
@@ -308,10 +310,10 @@ export function ApplyModal({
             </div>
 
             <div className="space-y-2">
-              <Label>CV / Resume *</Label>
+              <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground">CV / Resume *</Label>
               {file ? (
-                <div className="flex items-center gap-3 rounded-lg border border-border bg-white/5 p-3">
-                  <FileText className="size-5 text-gold" />
+                <div className="flex items-center gap-3 rounded-[2px] border-2 border-steel bg-white/5 p-3">
+                  <FileText className="size-5 text-primary" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm">{file.name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -319,7 +321,7 @@ export function ApplyModal({
                       {verifying && " · Verifying file format…"}
                     </p>
                     {file.size > 5 * 1024 * 1024 && (
-                      <p className="text-xs text-gold">Large file — upload may take a moment</p>
+                      <p className="text-xs text-accent">Large file — upload may take a moment</p>
                     )}
                   </div>
                   <Button
@@ -351,8 +353,8 @@ export function ApplyModal({
                     acceptFile(e.dataTransfer.files?.[0]);
                   }}
                   className={cn(
-                    "flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-border p-6 text-center transition-colors hover:border-gold/60",
-                    dragging && "border-gold bg-gold/5",
+                    "flex w-full flex-col items-center gap-2 rounded-[2px] border-2 border-dashed border-steel p-6 text-center transition-colors hover:border-primary/70",
+                    dragging && "border-primary bg-primary/5",
                   )}
                 >
                   <UploadCloud className="size-6 text-muted-foreground" />
@@ -372,9 +374,14 @@ export function ApplyModal({
               {fileError && <p className="text-xs text-destructive">{fileError}</p>}
             </div>
 
-            <Button type="submit" variant="rust" size="lg" className="w-full">
+            <button
+              type="submit"
+              className="weld-underline relative w-full border-2 border-primary bg-card px-8 py-4 font-display text-sm tracking-[3px] uppercase text-foreground transition-colors hover:bg-primary/10"
+              style={{ borderRadius: 2 }}
+            >
+              <Rivets />
               Submit application
-            </Button>
+            </button>
             {scanResult === "clean" && (
               <p className="flex items-center justify-center gap-1 text-xs text-success">
                 <ShieldCheck className="size-3.5" /> File verified
@@ -391,11 +398,11 @@ function SuccessScreen({ jobTitle, onClose }: { jobTitle: string; onClose: () =>
   return (
     <div className="page-enter flex flex-col items-center gap-5 py-10 text-center">
       <div className="relative grid size-20 place-items-center">
-        <span className="absolute inset-0 animate-ping rounded-full bg-gold/15 [animation-duration:2.4s]" />
-        <span className="absolute inset-2 rounded-full border border-gold/40" />
-        <Anchor className="size-9 text-gold" />
+        <span className="absolute inset-0 animate-ping rounded-full bg-primary/15 [animation-duration:2.4s]" />
+        <span className="absolute inset-2 rounded-full border border-primary/40" />
+        <Anchor className="size-9 animate-breathe text-primary drop-shadow-[0_0_18px_var(--poppy)]" />
       </div>
-      <DialogTitle className="font-display text-3xl text-gradient-gold">
+      <DialogTitle className="font-display text-3xl tracking-[3px] text-primary uppercase">
         Application received
       </DialogTitle>
       <DialogDescription className="max-w-sm text-base text-muted-foreground">

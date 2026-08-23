@@ -2,9 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, Ship, Waves, Wrench } from "lucide-react";
 import { listActiveJobs } from "@/lib/jobs.functions";
 import { JobCard } from "@/components/job-card";
-import { OceanBackdrop } from "@/components/ocean-backdrop";
+import { Rivets, SparkBurst, YardAtmosphere } from "@/components/industrial";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   loader: () => listActiveJobs(),
@@ -39,29 +38,38 @@ function Landing() {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
 
-      <section className="relative flex min-h-[88vh] items-center overflow-hidden">
-        <OceanBackdrop />
+      <section className="relative flex min-h-[92vh] items-center overflow-hidden">
+        <YardAtmosphere />
         <div className="page-enter relative mx-auto w-full max-w-6xl px-5 py-24">
-          <p className="text-xs tracking-[0.4em] text-gold uppercase">Shipyards · Greece</p>
-          <h1 className="mt-6 font-display text-6xl leading-none sm:text-8xl lg:text-[9rem]">
+          <p className="font-mono text-[11px] tracking-[0.5em] text-fog uppercase">
+            Shipyards · Greece
+          </p>
+          <h1 className="hero-title mt-6 text-[clamp(3rem,11vw,84px)] text-foreground">
             EUROHULL
           </h1>
-          <p className="mt-6 max-w-xl font-display text-2xl text-gradient-gold sm:text-3xl">
-            Building the Future of Maritime
+          <p className="mt-6 font-mono text-xs tracking-[6px] text-primary uppercase">
+            Ideas that float
           </p>
-          <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">
+          <p className="mt-7 max-w-xl leading-relaxed text-muted-foreground">
             We cut, weld and launch the vessels that keep Europe's coastlines moving. If you want
             your work measured in tonnes and horizons, there's a berth for you here.
           </p>
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            <Button variant="rust" size="lg" asChild>
-              <Link to="/jobs">Explore open roles</Link>
-            </Button>
+          <div className="mt-10 flex flex-wrap items-center gap-6">
+            <Link
+              to="/jobs"
+              className="group relative inline-flex items-center gap-3 border-2 border-primary bg-card px-8 py-4 font-display text-sm tracking-[3px] text-foreground uppercase transition-colors hover:bg-primary/10"
+              style={{ borderRadius: 2 }}
+            >
+              <Rivets />
+              <SparkBurst />
+              Join the yard
+              <ArrowDown className="size-4 -rotate-90 text-primary" />
+            </Link>
             <a
               href="#openings"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="font-mono text-[11px] tracking-[3px] text-muted-foreground uppercase transition-colors hover:text-foreground"
             >
-              Scroll to listings <ArrowDown className="size-4" />
+              Scroll to listings ↓
             </a>
           </div>
         </div>
@@ -70,14 +78,16 @@ function Landing() {
       <section className="mx-auto w-full max-w-6xl px-5 py-16">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {pillars.map(({ icon: Icon, title, text }) => (
-            <div key={title} className="glass rounded-xl p-6">
-              <Icon className="size-5 text-gold" />
+            <div key={title} className="metal-plate plate-hover group relative p-7">
+              <Rivets />
+              <Icon className="size-5 text-primary" />
               <h3 className="mt-4 font-display text-xl">{title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{text}</p>
             </div>
           ))}
         </div>
       </section>
+
 
       <section id="openings" className="mx-auto w-full max-w-6xl scroll-mt-20 px-5 pb-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
