@@ -177,27 +177,68 @@ export function SettingsForm() {
         Virus scanning enabled
       </label>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <h3 className="font-display text-lg">Social media API keys</h3>
-        {networks.map((network) => (
-          <div key={network} className="space-y-2">
-            <Label htmlFor={`key-${network}`} className="capitalize">
-              {network}
-            </Label>
-            <Input
-              id={`key-${network}`}
-              type="password"
-              placeholder="Not configured"
-              value={form.social_api_keys[network] ?? ""}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  social_api_keys: { ...form.social_api_keys, [network]: e.target.value },
-                })
-              }
-            />
-          </div>
-        ))}
+        {networks.map((network) => {
+          const state = connections[network.id];
+          const configured = Boolean(form.social_api_keys[network.id]);
+          const dotClass =
+            state === "ok"
+              ? "bg-success"
+              : state === "failed" || !configured
+                ? "bg-destructive"
+                : "bg-muted-foreground";
+          return (
+            <div key={network.id} className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className={`inline-block size-2 rounded-full ${dotClass}`} />
+                <Label htmlFor={`key-${network.id}`}>{network.label}</Label>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  id={`key-${network.id}`}
+                  type="password"
+                  placeholder="Access token — not configured"
+                  value={form.social_api_keys[network.id] ?? ""}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      social_api_keys: {
+                        ...form.social_api_keys,
+                        [network.id]: e.target.value,
+                      },
+                    })
+                  }
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={connectionMutation.isPending}
+                  onClick={() => connectionMutation.mutate(network.id)}
+                >
+                  Test connection
+                </Button>
+              </div>
+              <Input
+                id={`extra-${network.id}`}
+                placeholder={network.extraLabel}
+                value={form.social_api_keys[network.extraKey] ?? ""}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    social_api_keys: {
+                      ...form.social_api_keys,
+                      [network.extraKey]: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+          );
+        })}
+        <p className="text-xs text-muted-foreground">
+          Save settings before testing a connection — tests use the stored values.
+        </p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -212,7 +253,34 @@ export function SettingsForm() {
         >
           {testMutation.isPending ? "Testing…" : "Test scan"}
         </Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={previewMutation.isPending}
+          onClick={() => previewMutation.mutate()}
+        >
+          {previewMutation.isPending ? "Rendering…" : "Preview email"}
+        </Button>
       </div>
     </form>
+
+    <Dialog open={preview !== null} onOpenChange={() => setPreview(null)}>
+      <DialogContent className="glass border-border/60 sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="font-display text-2xl">Confirmation email preview</DialogTitle>
+          <DialogDescription>
+            Sample applicant: Μαρία Παπαδοπούλου — Naval Architect, Engineering, Piraeus, Greece
+          </DialogDescription>
+        </DialogHeader>
+        <div className="max-h-[65vh] overflow-y-auto rounded-lg border border-border/60">
+          <iframe
+            title="Email preview"
+            srcDoc={preview ?? ""}
+            className="h-[60vh] w-full bg-[#0a1628]"
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
