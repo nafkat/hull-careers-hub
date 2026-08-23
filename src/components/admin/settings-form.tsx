@@ -2,15 +2,39 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getSettings, saveSettings, testScan } from "@/lib/admin.functions";
+import {
+  checkSocialConnection,
+  getSettings,
+  previewConfirmationEmail,
+  saveSettings,
+  testScan,
+} from "@/lib/admin.functions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { NauticalSpinner } from "@/components/nautical-spinner";
 
-const networks = ["linkedin", "facebook", "instagram"] as const;
+const networks = [
+  { id: "linkedin", label: "LinkedIn", extraKey: "linkedin_org_id", extraLabel: "Organization ID" },
+  { id: "facebook", label: "Facebook", extraKey: "facebook_page_id", extraLabel: "Page ID" },
+  {
+    id: "instagram",
+    label: "Instagram",
+    extraKey: "instagram_account_id",
+    extraLabel: "Instagram account ID",
+  },
+] as const;
+
+type NetworkId = (typeof networks)[number]["id"];
 
 export function SettingsForm() {
   const fetchSettings = useServerFn(getSettings);
