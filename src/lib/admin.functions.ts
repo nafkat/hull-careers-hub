@@ -202,7 +202,7 @@ export const saveJob = createServerFn({ method: "POST" })
           job_listing_id: jobId,
           platform: result.network,
           post_url: result.postUrl ?? null,
-          status: result.posted ? "success" : "failed",
+          status: result.mocked ? "mocked" : result.posted ? "success" : "failed",
           error_message: result.error ?? null,
         })),
       );
