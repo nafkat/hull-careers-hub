@@ -14,7 +14,152 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_settings: {
+        Row: {
+          admin_password_hash: string | null
+          email_body_template: string
+          email_from: string
+          email_subject: string
+          id: boolean
+          max_file_size_mb: number
+          social_api_keys: Json
+          updated_at: string
+          virus_scan_enabled: boolean
+        }
+        Insert: {
+          admin_password_hash?: string | null
+          email_body_template?: string
+          email_from?: string
+          email_subject?: string
+          id?: boolean
+          max_file_size_mb?: number
+          social_api_keys?: Json
+          updated_at?: string
+          virus_scan_enabled?: boolean
+        }
+        Update: {
+          admin_password_hash?: string | null
+          email_body_template?: string
+          email_from?: string
+          email_subject?: string
+          id?: boolean
+          max_file_size_mb?: number
+          social_api_keys?: Json
+          updated_at?: string
+          virus_scan_enabled?: boolean
+        }
+        Relationships: []
+      }
+      applications: {
+        Row: {
+          cover_message: string | null
+          created_at: string
+          email: string
+          email_sent: boolean
+          file_mime_type: string | null
+          file_name: string | null
+          file_path: string | null
+          file_size: number | null
+          full_name: string
+          id: string
+          is_archived: boolean
+          is_read: boolean
+          job_listing_id: string
+          phone: string | null
+          virus_scan_status: string
+        }
+        Insert: {
+          cover_message?: string | null
+          created_at?: string
+          email: string
+          email_sent?: boolean
+          file_mime_type?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          full_name: string
+          id?: string
+          is_archived?: boolean
+          is_read?: boolean
+          job_listing_id: string
+          phone?: string | null
+          virus_scan_status?: string
+        }
+        Update: {
+          cover_message?: string | null
+          created_at?: string
+          email?: string
+          email_sent?: boolean
+          file_mime_type?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          full_name?: string
+          id?: string
+          is_archived?: boolean
+          is_read?: boolean
+          job_listing_id?: string
+          phone?: string | null
+          virus_scan_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_job_listing_id_fkey"
+            columns: ["job_listing_id"]
+            isOneToOne: false
+            referencedRelation: "job_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_listings: {
+        Row: {
+          created_at: string
+          department: string
+          description: string
+          employment_type: string
+          id: string
+          location: string
+          requirements: string[]
+          slug: string
+          social_auto_post: boolean
+          social_posted_at: string | null
+          status: string
+          summary: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          description?: string
+          employment_type?: string
+          id?: string
+          location?: string
+          requirements?: string[]
+          slug: string
+          social_auto_post?: boolean
+          social_posted_at?: string | null
+          status?: string
+          summary?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          description?: string
+          employment_type?: string
+          id?: string
+          location?: string
+          requirements?: string[]
+          slug?: string
+          social_auto_post?: boolean
+          social_posted_at?: string | null
+          status?: string
+          summary?: string
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
