@@ -167,6 +167,23 @@ function AdminConsole() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-status"] }),
   });
 
+  if (overview.isError) {
+    return (
+      <div className="grid min-h-screen place-items-center px-5">
+        <div className="metal-plate relative max-w-md space-y-4 p-8 text-center">
+          <Rivets />
+          <h1 className="font-display text-2xl tracking-[3px]">Connection lost</h1>
+          <p className="text-muted-foreground">
+            Connection to the yard server failed. Please try again.
+          </p>
+          <Button variant="rust" onClick={() => overview.refetch()}>
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (overview.isLoading || !overview.data) {
     return (
       <div className="mx-auto w-full max-w-6xl px-5 py-10">
