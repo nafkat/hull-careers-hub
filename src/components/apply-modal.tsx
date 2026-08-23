@@ -48,12 +48,21 @@ function formatSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function toBase64(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1] ?? "");
+    reader.onerror = () => reject(new Error("read-failed"));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function ApplyModal({
   job,
   open,
   onOpenChange,
 }: {
-  job: Job;
+  job: PublicJob;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
