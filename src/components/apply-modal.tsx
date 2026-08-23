@@ -127,25 +127,54 @@ export function ApplyModal({
 
     setStage("uploading");
     setProgress(0);
-    await new Promise<void>((resolve) => {
-      let value = 0;
-      const timer = setInterval(() => {
-        value += Math.random() * 18 + 8;
-        setProgress(Math.min(100, Math.round(value)));
-        if (value >= 100) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 160);
-    });
+    const ticker = setInterval(() => {
+      setProgress((current) => (current >= 92 ? current : current + Math.round(Math.random() * 12 + 5)));
+    }, 160);
 
+    let base64: string;
+    try {
+      base64 = await toBase64(file);
+    } catch {
+      clearInterval(ticker);
+      setFileError("We could not read that file. Please try again.");
+      setStage("form");
+      return;
+    }
+
+    let result: Awaited<ReturnType<typeof submitApplication>>;
+    try {
+      result = await submitApplication({
+        data: {
+          jobId: job.id,
+          fullName: parsed.data.fullName,
+          email: parsed.data.email,
+          phone: parsed.data.phone ?? "",
+          coverMessage: parsed.data.coverMessage ?? "",
+          fileName: file.name,
+          fileMimeType: file.type || "application/pdf",
+          fileBase64: base64,
+        },
+      });
+    } catch {
+      clearInterval(ticker);
+      setFileError("Submission failed. Please try again in a moment.");
+      setStage("form");
+      return;
+    }
+
+    clearInterval(ticker);
+    setProgress(100);
     setStage("scanning");
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    // Simulated scan — filenames flagged as suspicious are quarantined.
-    const suspicious = /virus|malware|infected/i.test(file.name);
-    if (suspicious) {
+
+    if (result.status === "infected") {
       setScanResult("infected");
       setStage("infected");
+      return;
+    }
+    if (result.status === "error") {
+      setFileError(result.message);
+      setStage("form");
       return;
     }
     setScanResult("clean");
