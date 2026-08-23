@@ -65,16 +65,19 @@ function JobDetail() {
           <ArrowLeft className="size-4" /> All positions
         </Link>
 
-        <span
-          className="mt-8 inline-block rounded-full px-3 py-1 text-xs font-medium"
-          style={{
-            color: accent,
-            backgroundColor: `color-mix(in oklab, ${accent} 16%, transparent)`,
-            border: `1px solid color-mix(in oklab, ${accent} 35%, transparent)`,
-          }}
-        >
-          {job.department}
-        </span>
+        <div className="mt-8">
+          <span
+            className="inline-block rounded-full px-3 py-1 text-xs font-medium"
+            style={{
+              color: accent,
+              backgroundColor: `color-mix(in oklab, ${accent} 16%, transparent)`,
+              border: `1px solid color-mix(in oklab, ${accent} 35%, transparent)`,
+            }}
+          >
+            {job.department}
+          </span>
+        </div>
+
 
         <h1 className="mt-4 font-display text-4xl leading-tight sm:text-5xl">{job.title}</h1>
 
