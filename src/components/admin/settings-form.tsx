@@ -40,6 +40,10 @@ export function SettingsForm() {
   const fetchSettings = useServerFn(getSettings);
   const persist = useServerFn(saveSettings);
   const runTestScan = useServerFn(testScan);
+  const testConnection = useServerFn(checkSocialConnection);
+  const renderPreview = useServerFn(previewConfirmationEmail);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [connections, setConnections] = useState<Record<string, "ok" | "failed" | "unknown">>({});
   const [form, setForm] = useState<{
     max_file_size_mb: number;
     email_from: string;
