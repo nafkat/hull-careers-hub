@@ -149,18 +149,21 @@ export const submitApplication = createServerFn({ method: "POST" })
       return { status: "scan-error", applicationId: application.id };
     }
 
-    const body = renderTemplate(
-      settings?.email_body_template ??
-        "Thank you {{full_name}}, we received your application for {{job_title}}.",
-      { full_name: data.fullName, job_title: job.title },
-    );
+    const emailVars = {
+      full_name: data.fullName,
+      job_title: job.title,
+      department: job.department ?? "",
+      location: job.location ?? "",
+      date: new Date().toLocaleDateString("el-GR"),
+    };
+    const body = buildConfirmationEmailHtml({
+      bodyTemplate: settings?.email_body_template ?? null,
+      vars: emailVars,
+    });
     const { sent } = await sendConfirmationEmail({
       to: data.email,
       from: settings?.email_from ?? "careers@eurohull.com",
-      subject: renderTemplate(settings?.email_subject ?? "Application received", {
-        full_name: data.fullName,
-        job_title: job.title,
-      }),
+      subject: renderTemplate(settings?.email_subject ?? "Application received", emailVars),
       body,
     });
 
