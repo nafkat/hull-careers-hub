@@ -102,7 +102,7 @@ function PasswordGate() {
             id="password"
             type="password"
             autoComplete="current-password"
-            className="industrial-input px-0"
+            className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 shadow-none focus-visible:border-primary focus-visible:ring-0"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />

@@ -128,7 +128,7 @@ export function SettingsForm() {
         <div className="space-y-2">
           <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="email-from">Email from address</Label>
           <Input
-            className="industrial-input px-0"
+            className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 shadow-none focus-visible:border-primary focus-visible:ring-0"
             id="email-from"
             type="email"
             value={form.email_from}
@@ -138,7 +138,7 @@ export function SettingsForm() {
         <div className="space-y-2">
           <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="max-size">Max file size (MB)</Label>
           <Input
-            className="industrial-input px-0"
+            className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 shadow-none focus-visible:border-primary focus-visible:ring-0"
             id="max-size"
             type="number"
             min={1}
@@ -152,7 +152,7 @@ export function SettingsForm() {
       <div className="space-y-2">
         <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="email-subject">Confirmation subject</Label>
         <Input
-          className="industrial-input px-0"
+          className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 shadow-none focus-visible:border-primary focus-visible:ring-0"
           id="email-subject"
           value={form.email_subject}
           onChange={(e) => setForm({ ...form, email_subject: e.target.value })}
@@ -162,7 +162,7 @@ export function SettingsForm() {
       <div className="space-y-2">
         <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="email-body">Confirmation body</Label>
         <Textarea
-          className="industrial-input px-0"
+          className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 shadow-none focus-visible:border-primary focus-visible:ring-0"
           id="email-body"
           rows={5}
           value={form.email_body_template}
@@ -177,7 +177,7 @@ export function SettingsForm() {
       <div className="space-y-2">
         <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="clamav-url">ClamAV API URL</Label>
         <Input
-          className="industrial-input px-0"
+          className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 shadow-none focus-visible:border-primary focus-visible:ring-0"
           id="clamav-url"
           type="url"
           placeholder="https://your-clamav-host/scan"
@@ -192,7 +192,7 @@ export function SettingsForm() {
       <div className="space-y-2">
         <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="rate-limit">Applications per day (per email)</Label>
         <Input
-          className="industrial-input px-0"
+          className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 shadow-none focus-visible:border-primary focus-visible:ring-0"
           id="rate-limit"
           type="number"
           min={1}
@@ -229,7 +229,7 @@ export function SettingsForm() {
               </div>
               <div className="flex gap-2">
                 <Input
-                  className="industrial-input px-0"
+                  className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 shadow-none focus-visible:border-primary focus-visible:ring-0"
                   id={`key-${network.id}`}
                   type="password"
                   placeholder="Access token — not configured"
@@ -255,7 +255,7 @@ export function SettingsForm() {
                 </Button>
               </div>
               <Input
-                className="industrial-input px-0"
+                className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 shadow-none focus-visible:border-primary focus-visible:ring-0"
                 id={`extra-${network.id}`}
                 placeholder={network.extraLabel}
                 value={form.social_api_keys[network.extraKey] ?? ""}
