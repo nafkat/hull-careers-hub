@@ -4,7 +4,7 @@ import { ArrowLeft, MapPin, Clock, Building2 } from "lucide-react";
 import { departmentAccent } from "@/data/departments";
 import { getActiveJob } from "@/lib/jobs.functions";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { Button } from "@/components/ui/button";
+import { Rivets } from "@/components/industrial";
 import { ApplyModal } from "@/components/apply-modal";
 
 export const Route = createFileRoute("/jobs/$slug")({
