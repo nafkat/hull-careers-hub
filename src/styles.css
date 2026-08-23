@@ -54,14 +54,30 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  --font-display: "Oswald", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, monospace;
+  --color-navy-deep: var(--navy-deep);
+  --color-navy-card: var(--navy-card);
+  --color-poppy: var(--poppy);
+  --color-weld: var(--weld);
+  --color-fog: var(--fog);
   --animate-wave: wave 14s ease-in-out infinite;
   --animate-wave-slow: wave 22s ease-in-out infinite reverse;
   --animate-drift: drift 18s ease-in-out infinite alternate;
   --animate-fade-up: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-sweep: sweep 2s linear infinite;
+  --animate-spark-fly: spark-fly 1.4s ease-out infinite;
+  --animate-breathe: breathe 4s ease-in-out infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-spotlight: spotlight 9s ease-in-out infinite alternate;
+  --animate-bounce-soft: bounce-soft 1.6s ease-in-out infinite;
+  --animate-radar: radar 2.4s linear infinite;
+  --animate-page-enter: page-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-rivet-pop: rivet-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-weld-flash: weld-flash 2.6s ease-in-out infinite;
 }
+
 
 :root {
   --radius: 0.75rem;
