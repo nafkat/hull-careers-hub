@@ -22,7 +22,8 @@ import {
   Shield,
   Anchor,
 } from "lucide-react";
-import type { Job } from "@/data/jobs";
+import type { PublicJob } from "@/lib/jobs.functions";
+import { submitApplication } from "@/lib/applications.functions";
 import { cn } from "@/lib/utils";
 
 const MAX_FILE_MB = 10;
