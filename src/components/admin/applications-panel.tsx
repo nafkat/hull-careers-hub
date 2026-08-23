@@ -35,7 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Rivets } from "@/components/industrial";
-import { Download, Archive, MailOpen, ShieldAlert, RefreshCw } from "lucide-react";
+import { Download, Archive, MailOpen, ShieldAlert, RefreshCw, Inbox } from "lucide-react";
 
 function formatFileSize(bytes: number | null) {
   if (!bytes) return "—";
@@ -49,16 +49,31 @@ const pill =
 
 function scanBadge(status: string) {
   if (status === "clean")
-    return <span className={`${pill} border-success/50 bg-success/10 text-success`}>Clean</span>;
+    return (
+      <span aria-label="Virus scan: clean" className={`${pill} border-success/50 bg-success/10 text-success`}>
+        Clean
+      </span>
+    );
   if (status === "infected")
     return (
-      <span className={`${pill} border-destructive/60 bg-destructive/10 text-destructive`}>
+      <span
+        aria-label="Virus scan: threat detected"
+        className={`${pill} border-destructive/60 bg-destructive/10 text-destructive`}
+      >
         Threat
       </span>
     );
   if (status === "error")
-    return <span className={`${pill} border-steel bg-muted/40 text-muted-foreground`}>Scan error</span>;
-  return <span className={`${pill} border-accent/50 bg-accent/10 text-accent`}>Pending</span>;
+    return (
+      <span aria-label="Virus scan: error" className={`${pill} border-steel bg-muted/40 text-muted-foreground`}>
+        Scan error
+      </span>
+    );
+  return (
+    <span aria-label="Virus scan: pending" className={`${pill} border-accent/50 bg-accent/10 text-accent`}>
+      Pending
+    </span>
+  );
 }
 
 export function ApplicationsPanel({
@@ -167,7 +182,7 @@ export function ApplicationsPanel({
 
       <div className="metal-plate relative overflow-x-auto">
         <Rivets />
-        <Table className="steel-table">
+        <Table className="steel-table min-w-[640px]">
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
@@ -182,7 +197,8 @@ export function ApplicationsPanel({
           <TableBody>
             {visible.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
+                  <Inbox className="mx-auto mb-3 size-12 opacity-60" aria-hidden />
                   No applications yet.
                 </TableCell>
               </TableRow>
@@ -190,7 +206,18 @@ export function ApplicationsPanel({
             {visible.map((application) => (
               <TableRow
                 key={application.id}
+                tabIndex={0}
+                role="button"
+                aria-label={`Open application from ${application.full_name}`}
                 className="cursor-pointer"
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter" && event.key !== " ") return;
+                  event.preventDefault();
+                  setSelected(application);
+                  if (!application.is_read) {
+                    flagMutation.mutate({ id: application.id, is_read: true });
+                  }
+                }}
                 onClick={() => {
                   setSelected(application);
                   if (!application.is_read) {

@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Anchor } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "../components/ui/sonner";
@@ -15,21 +16,22 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+    <div className="grid-bg grid min-h-screen place-items-center px-5">
+      <div className="page-enter flex max-w-md flex-col items-center text-center">
+        <Anchor className="size-12 text-primary" aria-hidden />
+        <p className="font-display text-[clamp(72px,20vw,120px)] leading-none tracking-[6px] text-steel">
+          404
         </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
-          </Link>
-        </div>
+        <h1 className="mt-2 font-display text-2xl tracking-[3px] text-foreground">Page not found</h1>
+        <p className="mt-3 text-muted-foreground">
+          This section of the yard is under construction.
+        </p>
+        <Link
+          to="/"
+          className="mt-8 inline-flex min-h-[44px] items-center rounded-[2px] border-2 border-primary bg-card px-8 py-3 font-display text-sm tracking-[3px] text-foreground uppercase transition-colors hover:bg-primary/10"
+        >
+          Return to dock
+        </Link>
       </div>
     </div>
   );
@@ -81,6 +83,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "EUROHULL Careers" },
       { name: "description", content: "Careers at EUROHULL shipyards." },
       { name: "author", content: "EUROHULL" },
+      { name: "theme-color", content: "#0B1F3A" },
+      { property: "og:site_name", content: "EUROHULL Careers" },
       { property: "og:title", content: "EUROHULL Careers" },
       { property: "og:description", content: "Careers at EUROHULL shipyards." },
       { property: "og:type", content: "website" },

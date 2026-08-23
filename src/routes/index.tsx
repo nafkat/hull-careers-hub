@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowDown, Ship, Waves, Wrench } from "lucide-react";
+import { Anchor, ArrowDown, Ship, Waves, Wrench } from "lucide-react";
 import { listActiveJobs } from "@/lib/jobs.functions";
 import { JobCard } from "@/components/job-card";
 import { Rivets, SparkBurst, YardAtmosphere } from "@/components/industrial";
@@ -15,6 +15,13 @@ export const Route = createFileRoute("/")({
         content:
           "Join EUROHULL shipyards in Greece. Open roles in naval architecture, hull production, marine design and yard operations.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "EUROHULL Careers" },
+      {
+        name: "twitter:description",
+        content: "Open shipyard roles at EUROHULL: engineering, production, design and operations.",
+      },
       { property: "og:title", content: "EUROHULL Careers — Building the Future of Maritime" },
       {
         property: "og:description",
@@ -24,6 +31,15 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
+
+function EmptyOpenings() {
+  return (
+    <div className="mt-10 flex flex-col items-center gap-3 py-16 text-center">
+      <Anchor className="size-12 text-muted-foreground" aria-hidden />
+      <p className="text-muted-foreground">No positions currently open. Check back soon.</p>
+    </div>
+  );
+}
 
 const pillars = [
   { icon: Ship, title: "90m hulls", text: "Offshore support vessels built end-to-end in Elefsina." },
@@ -36,7 +52,11 @@ function Landing() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <a href="#main" className="skip-link">
+        Skip to main content
+      </a>
       <SiteHeader />
+      <main id="main">
 
       <section className="relative flex min-h-[92vh] items-center overflow-hidden">
         <YardAtmosphere />
@@ -44,10 +64,10 @@ function Landing() {
           <p className="font-mono text-[11px] tracking-[0.5em] text-fog uppercase">
             Shipyards · Greece
           </p>
-          <h1 className="hero-title mt-6 text-[clamp(3rem,11vw,84px)] text-foreground">
+          <h1 className="hero-title mt-6 text-[clamp(2.5rem,12vw,84px)] max-sm:tracking-[6px] text-foreground">
             EUROHULL
           </h1>
-          <p className="mt-6 font-mono text-xs tracking-[6px] text-primary uppercase">
+          <p className="mt-6 font-mono text-xs tracking-[4px] sm:tracking-[6px] text-primary uppercase">
             Ideas that float
           </p>
           <p className="mt-7 max-w-xl leading-relaxed text-muted-foreground">
@@ -57,7 +77,7 @@ function Landing() {
           <div className="mt-10 flex flex-wrap items-center gap-6">
             <Link
               to="/jobs"
-              className="group relative inline-flex items-center gap-3 border-2 border-primary bg-card px-8 py-4 font-display text-sm tracking-[3px] text-foreground uppercase transition-colors hover:bg-primary/10"
+              className="group relative inline-flex w-full min-h-[44px] justify-center sm:w-auto items-center gap-3 border-2 border-primary bg-card px-6 py-3 sm:px-8 sm:py-4 font-display text-sm tracking-[3px] text-foreground uppercase transition-colors hover:bg-primary/10"
               style={{ borderRadius: 2 }}
             >
               <Rivets />
@@ -77,8 +97,12 @@ function Landing() {
 
       <section className="mx-auto w-full max-w-6xl px-5 py-16">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {pillars.map(({ icon: Icon, title, text }) => (
-            <div key={title} className="metal-plate plate-hover group relative p-7">
+          {pillars.map(({ icon: Icon, title, text }, index) => (
+            <div
+              key={title}
+              className="metal-plate plate-hover stagger-in group relative p-4 sm:p-7"
+              style={{ animationDelay: `${index * 150}ms` }}
+            >
               <Rivets />
               <Icon className="size-5 text-primary" />
               <h3 className="mt-4 font-display text-xl">{title}</h3>
@@ -100,13 +124,18 @@ function Landing() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {jobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
-        </div>
+        {jobs.length === 0 ? (
+          <EmptyOpenings />
+        ) : (
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {jobs.map((job, index) => (
+              <JobCard key={job.id} job={job} index={index} />
+            ))}
+          </div>
+        )}
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

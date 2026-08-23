@@ -545,3 +545,101 @@
     box-shadow: none;
   }
 }
+
+/* ── final polish: motion, focus, skeletons, tap targets ───── */
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@utility skeleton-plate {
+  background-image: linear-gradient(90deg, #111d32 25%, #1a2b47 50%, #111d32 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+  animation-play-state: var(--animation-play-state, running);
+  border: 2px solid color-mix(in oklab, var(--steel-raw) 60%, transparent);
+  border-radius: 4px;
+}
+
+@utility gpu {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+@utility stagger-in {
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@utility skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 10000;
+  &:focus {
+    left: 8px;
+    top: 8px;
+    padding: 10px 16px;
+    background-color: var(--navy-card);
+    border: 2px solid var(--poppy);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  button,
+  a,
+  [role="button"],
+  label,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+
+  /* visible, consistent focus ring everywhere */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible,
+  [role="tab"]:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--poppy);
+    outline-offset: 2px;
+  }
+
+  .beam-layer,
+  .dust-dot,
+  .animated-element {
+    animation-play-state: var(--animation-play-state, running);
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .beam-layer,
+  .dust-dot {
+    display: none !important;
+  }
+}

@@ -198,7 +198,7 @@ export function ApplyModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="metal-plate relative max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="metal-plate !fixed !top-0 !left-0 h-screen max-h-screen w-screen !max-w-full !translate-x-0 !translate-y-0 !rounded-none overflow-y-auto sm:!top-1/2 sm:!left-1/2 sm:h-auto sm:max-h-[90vh] sm:w-full sm:!max-w-lg sm:!-translate-x-1/2 sm:!-translate-y-1/2 sm:!rounded-[4px]">
         <Rivets />
         {stage === "success" ? (
           <SuccessScreen jobTitle={job.title} onClose={() => handleOpenChange(false)} />
@@ -258,7 +258,7 @@ export function ApplyModal({
             <div className="space-y-2">
               <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="fullName">Full name *</Label>
               <Input
-                id="fullName" className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
+                id="fullName" className="h-11 min-h-[44px] rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                 value={fullName}
                 maxLength={100}
                 onChange={(e) => setFullName(e.target.value)}
@@ -273,7 +273,7 @@ export function ApplyModal({
               <div className="space-y-2">
                 <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="email">Email *</Label>
                 <Input
-                  id="email" className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
+                  id="email" className="h-11 min-h-[44px] rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                   type="email"
                   value={email}
                   maxLength={255}
@@ -287,7 +287,7 @@ export function ApplyModal({
               <div className="space-y-2">
                 <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="phone">Phone</Label>
                 <Input
-                  id="phone" className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
+                  id="phone" className="h-11 min-h-[44px] rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                   value={phone}
                   maxLength={40}
                   onChange={(e) => setPhone(e.target.value)}
@@ -353,7 +353,7 @@ export function ApplyModal({
                     acceptFile(e.dataTransfer.files?.[0]);
                   }}
                   className={cn(
-                    "flex w-full flex-col items-center gap-2 rounded-[2px] border-2 border-dashed border-steel p-6 text-center transition-colors hover:border-primary/70",
+                    "flex w-full flex-col items-center gap-2 rounded-[2px] border-2 border-dashed border-steel p-8 text-center transition-colors hover:border-primary/70",
                     dragging && "border-primary bg-primary/5",
                   )}
                 >
@@ -376,11 +376,12 @@ export function ApplyModal({
 
             <button
               type="submit"
-              className="weld-underline relative w-full border-2 border-primary bg-card px-8 py-4 font-display text-sm tracking-[3px] uppercase text-foreground transition-colors hover:bg-primary/10"
+              disabled={verifying}
+              className="weld-underline relative min-h-[44px] w-full border-2 border-primary bg-card px-8 py-4 font-display text-sm tracking-[3px] uppercase text-foreground transition-colors hover:bg-primary/10 disabled:opacity-60"
               style={{ borderRadius: 2 }}
             >
               <Rivets />
-              Submit application
+              {verifying ? "Verifying…" : "Submit application"}
             </button>
             {scanResult === "clean" && (
               <p className="flex items-center justify-center gap-1 text-xs text-success">
@@ -397,10 +398,10 @@ export function ApplyModal({
 function SuccessScreen({ jobTitle, onClose }: { jobTitle: string; onClose: () => void }) {
   return (
     <div className="page-enter flex flex-col items-center gap-5 py-10 text-center">
-      <div className="relative grid size-20 place-items-center">
+      <div className="relative grid size-16 sm:size-20 place-items-center">
         <span className="absolute inset-0 animate-ping rounded-full bg-primary/15 [animation-duration:2.4s]" />
         <span className="absolute inset-2 rounded-full border border-primary/40" />
-        <Anchor className="size-9 animate-breathe text-primary drop-shadow-[0_0_18px_var(--poppy)]" />
+        <Anchor className="size-12 sm:size-9 animate-breathe text-primary drop-shadow-[0_0_18px_var(--poppy)]" />
       </div>
       <DialogTitle className="font-display text-3xl tracking-[3px] text-primary uppercase">
         Application received

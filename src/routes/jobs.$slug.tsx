@@ -27,6 +27,39 @@ export const Route = createFileRoute("/jobs/$slug")({
         { name: "description", content: job.summary },
         { property: "og:title", content: title },
         { property: "og:description", content: job.summary },
+        { property: "og:type", content: "article" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: job.summary },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "JobPosting",
+            title: job.title,
+            description: job.summary,
+            hiringOrganization: {
+              "@type": "Organization",
+              name: "EUROHULL Shipyards",
+              sameAs: "https://www.eurohull.com",
+            },
+            jobLocation: {
+              "@type": "Place",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: job.location,
+                addressCountry: "GR",
+              },
+            },
+            employmentType: job.employment_type,
+            datePosted: job.created_at,
+            validThrough: new Date(
+              new Date(job.created_at).getTime() + 30 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+          }),
+        },
       ],
     };
   },
@@ -58,7 +91,7 @@ function JobDetail() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="page-enter mx-auto w-full max-w-3xl flex-1 px-5 py-14">
+      <main id="main" className="page-enter mx-auto w-full max-w-3xl flex-1 px-5 py-14">
         <Link
           to="/jobs"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -114,7 +147,7 @@ function JobDetail() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="weld-underline group relative w-full border-2 border-primary bg-card px-8 py-4 font-display text-sm tracking-[3px] text-foreground uppercase transition-colors hover:bg-primary/10"
+            className="weld-underline group relative min-h-[44px] w-full border-2 border-primary bg-card px-8 py-4 font-display text-sm tracking-[3px] text-foreground uppercase transition-colors hover:bg-primary/10"
             style={{ borderRadius: 2 }}
           >
             <Rivets />

@@ -4,25 +4,26 @@ import { departmentAccent } from "@/data/departments";
 import { Rivets, SparkBurst } from "@/components/industrial";
 import type { PublicJob } from "@/lib/jobs.functions";
 
-export function JobCard({ job }: { job: PublicJob }) {
+export function JobCard({ job, index = 0 }: { job: PublicJob; index?: number }) {
   const accent = departmentAccent(job.department);
 
   return (
     <Link
       to="/jobs/$slug"
       params={{ slug: job.slug }}
-      className="metal-plate plate-hover group relative flex flex-col gap-4 p-6 pt-7"
+      className="metal-plate plate-hover stagger-in group relative flex flex-col gap-4 p-4 pt-6 sm:p-6 sm:pt-7"
+      style={{ animationDelay: `${Math.min(index, 9) * 80}ms` }}
     >
       <Rivets />
       <SparkBurst />
       <span
         aria-hidden
-        className="absolute inset-y-0 left-0 w-[3px]"
+        className="absolute inset-y-0 left-0 w-[2px] sm:w-[3px]"
         style={{ backgroundColor: accent }}
       />
 
       <div className="flex items-start justify-between gap-3">
-        <h3 className="font-display text-2xl leading-snug tracking-[2px] text-foreground uppercase">
+        <h3 className="font-display text-xl leading-snug tracking-[1px] text-foreground uppercase sm:text-2xl sm:tracking-[2px]">
           {job.title}
         </h3>
         <ArrowUpRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" />
