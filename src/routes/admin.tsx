@@ -240,13 +240,18 @@ function AdminConsole() {
                       {job.location}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={job.status === "active" ? "default" : "secondary"}
-                        className="capitalize"
+                      <span
+                        className={`inline-block rounded-[2px] border px-2 py-0.5 font-mono text-[10px] tracking-[1.5px] uppercase ${
+                          job.status === "active"
+                            ? "border-success/50 bg-success/10 text-success"
+                            : job.status === "closed"
+                              ? "border-destructive/50 bg-destructive/10 text-destructive"
+                              : "border-steel bg-muted/40 text-muted-foreground"
+                        }`}
                       >
                         {job.status}
-                      </Badge>
-                    </TableCell>
+                      </span>
+
                     <TableCell className="hidden text-muted-foreground lg:table-cell">
                       {job.social_auto_post ? "On" : "Off"}
                     </TableCell>
