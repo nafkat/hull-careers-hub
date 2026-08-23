@@ -91,6 +91,7 @@ export function SettingsForm() {
   if (query.isLoading || !form) return <NauticalSpinner label="Loading settings" />;
 
   return (
+    <>
     <form
       className="glass max-w-2xl space-y-5 rounded-xl p-6"
       onSubmit={(event) => {
