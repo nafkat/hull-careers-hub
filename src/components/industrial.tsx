@@ -22,11 +22,11 @@ export function Rivets({ className }: { className?: string }) {
 /** Welding sparks that fly out on hover of the parent (`group`). */
 export function SparkBurst({ className }: { className?: string }) {
   const sparks = [
-    { left: "8%", bottom: "10%", delay: "0s", tx: "38px", ty: "-52px" },
-    { left: "26%", bottom: "6%", delay: "0.12s", tx: "-30px", ty: "-64px" },
-    { left: "52%", bottom: "12%", delay: "0.05s", tx: "26px", ty: "-70px" },
-    { left: "74%", bottom: "8%", delay: "0.2s", tx: "-22px", ty: "-48px" },
-    { left: "90%", bottom: "14%", delay: "0.28s", tx: "34px", ty: "-58px" },
+    { left: "8%", bottom: "10%", delay: "0s" },
+    { left: "26%", bottom: "6%", delay: "0.12s" },
+    { left: "52%", bottom: "12%", delay: "0.05s" },
+    { left: "74%", bottom: "8%", delay: "0.2s" },
+    { left: "90%", bottom: "14%", delay: "0.28s" },
   ];
   return (
     <span
@@ -40,15 +40,7 @@ export function SparkBurst({ className }: { className?: string }) {
         <span
           key={s.left}
           className="absolute size-[3px] rounded-full bg-accent shadow-[0_0_6px_var(--weld)] group-hover:animate-spark-fly"
-          style={
-            {
-              left: s.left,
-              bottom: s.bottom,
-              animationDelay: s.delay,
-              "--tw-translate-x": s.tx,
-              "--tw-translate-y": s.ty,
-            } as React.CSSProperties
-          }
+          style={{ left: s.left, bottom: s.bottom, animationDelay: s.delay }}
         />
       ))}
     </span>
