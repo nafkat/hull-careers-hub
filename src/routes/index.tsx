@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, Ship, Waves, Wrench } from "lucide-react";
-import { activeJobs } from "@/data/jobs";
+import { listActiveJobs } from "@/lib/jobs.functions";
 import { JobCard } from "@/components/job-card";
 import { OceanBackdrop } from "@/components/ocean-backdrop";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
+  loader: () => listActiveJobs(),
   head: () => ({
     meta: [
       { title: "EUROHULL Careers — Building the Future of Maritime" },
@@ -32,6 +33,8 @@ const pillars = [
 ];
 
 function Landing() {
+  const { jobs } = Route.useLoaderData();
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
@@ -83,12 +86,12 @@ function Landing() {
             <h2 className="mt-3 font-display text-4xl">Open positions</h2>
           </div>
           <Link to="/jobs" className="text-sm text-gold underline-offset-4 hover:underline">
-            View all {activeJobs.length} roles
+            View all {jobs.length} roles
           </Link>
         </div>
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {activeJobs.map((job) => (
+          {jobs.map((job) => (
             <JobCard key={job.id} job={job} />
           ))}
         </div>
