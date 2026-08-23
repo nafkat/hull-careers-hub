@@ -10,13 +10,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { Rivets } from "@/components/industrial";
 import { NauticalSpinner } from "@/components/nautical-spinner";
 
 function statusBadge(status: string) {
-  if (status === "success") return <Badge className="bg-success/15 text-success">Posted</Badge>;
-  if (status === "failed") return <Badge variant="destructive">Failed</Badge>;
-  return <Badge variant="secondary" className="capitalize">{status}</Badge>;
+  const pill =
+    "inline-block rounded-[2px] border px-2 py-0.5 font-mono text-[10px] tracking-[1.5px] uppercase";
+  if (status === "success")
+    return <span className={`${pill} border-success/50 bg-success/10 text-success`}>Posted</span>;
+  if (status === "failed")
+    return (
+      <span className={`${pill} border-destructive/60 bg-destructive/10 text-destructive`}>Failed</span>
+    );
+  return <span className={`${pill} border-steel bg-muted/40 text-muted-foreground`}>{status}</span>;
 }
 
 export function SocialPostsPanel() {
@@ -32,9 +38,10 @@ export function SocialPostsPanel() {
 
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-2xl">Social posts</h2>
-      <div className="glass overflow-x-auto rounded-xl">
-        <Table>
+      <h2 className="font-display text-2xl tracking-[2px]">Social posts</h2>
+      <div className="metal-plate relative overflow-x-auto">
+        <Rivets />
+        <Table className="steel-table">
           <TableHeader>
             <TableRow>
               <TableHead>Job</TableHead>
@@ -64,7 +71,7 @@ export function SocialPostsPanel() {
                       href={post.post_url}
                       target="_blank"
                       rel="noreferrer noopener"
-                      className="inline-flex items-center gap-1 text-gold hover:underline"
+                      className="inline-flex items-center gap-1 text-accent hover:underline"
                     >
                       View <ExternalLink className="size-3" />
                     </a>
