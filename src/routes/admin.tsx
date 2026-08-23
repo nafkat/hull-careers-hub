@@ -319,10 +319,14 @@ function StatCard({
   value: number;
 }) {
   return (
-    <div className="glass glass-hover rounded-xl p-6">
-      <Icon className="size-5 text-gold" />
-      <p className="mt-4 font-display text-4xl">{value}</p>
-      <p className="mt-1 text-sm text-muted-foreground">{label}</p>
+    <div className="metal-plate plate-hover relative p-6">
+      <Rivets />
+      <Icon className="size-5 text-primary" />
+      <p className="mt-4 font-display text-[40px] leading-none tracking-[2px]">{value}</p>
+      <p className="mt-2 font-mono text-[11px] tracking-[2px] text-muted-foreground uppercase">
+        {label}
+      </p>
     </div>
+
   );
 }
