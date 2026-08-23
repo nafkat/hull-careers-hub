@@ -4,7 +4,6 @@ import { listActiveJobs } from "@/lib/jobs.functions";
 import { JobCard } from "@/components/job-card";
 import { Rivets, SparkBurst, YardAtmosphere } from "@/components/industrial";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   loader: () => listActiveJobs(),
