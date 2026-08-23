@@ -73,6 +73,7 @@ export function ApplyModal({
   const [coverMessage, setCoverMessage] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [progress, setProgress] = useState(0);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
@@ -87,6 +88,7 @@ export function ApplyModal({
     setCoverMessage("");
     setFile(null);
     setFileError(null);
+    setVerifying(false);
     setErrors({});
     setProgress(0);
     setScanResult(null);
@@ -110,6 +112,8 @@ export function ApplyModal({
     }
     setFileError(null);
     setFile(candidate);
+    setVerifying(true);
+    setTimeout(() => setVerifying(false), 900);
   }
 
   async function handleSubmit(event: React.FormEvent) {
@@ -170,6 +174,14 @@ export function ApplyModal({
     if (result.status === "infected") {
       setScanResult("infected");
       setStage("infected");
+      return;
+    }
+    if (result.status === "scan-error") {
+      setFileError(
+        "We could not complete the virus scan. Your application was received and our team will review it manually.",
+      );
+      setScanResult("clean");
+      setStage("success");
       return;
     }
     if (result.status === "error") {
@@ -302,13 +314,23 @@ export function ApplyModal({
                   <FileText className="size-5 text-gold" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm">{file.name}</p>
-                    <p className="text-xs text-muted-foreground">{formatSize(file.size)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatSize(file.size)}
+                      {verifying && " · Verifying file format…"}
+                    </p>
+                    {file.size > 5 * 1024 * 1024 && (
+                      <p className="text-xs text-gold">Large file — upload may take a moment</p>
+                    )}
                   </div>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => setFile(null)}
+                    onClick={() => {
+                      setFile(null);
+                      setVerifying(false);
+                      setFileError(null);
+                    }}
                     aria-label="Remove file"
                   >
                     <X className="size-4" />
