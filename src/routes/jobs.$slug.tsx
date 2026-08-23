@@ -53,7 +53,7 @@ function JobNotFound() {
 function JobDetail() {
   const { job } = Route.useLoaderData();
   const [open, setOpen] = useState(false);
-  const accent = departmentAccent[job.department];
+  const accent = departmentAccent(job.department);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -87,7 +87,7 @@ function JobDetail() {
             <MapPin className="size-4" /> {job.location}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Clock className="size-4" /> {job.employmentType}
+            <Clock className="size-4" /> {job.employment_type}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <Building2 className="size-4" /> EUROHULL Shipyards
@@ -97,7 +97,7 @@ function JobDetail() {
         <div className="glass mt-10 space-y-8 rounded-xl p-7">
           <section className="space-y-4">
             <h2 className="font-display text-2xl">About the role</h2>
-            {job.description.map((paragraph) => (
+            {job.description.split(/\n{2,}/).map((paragraph) => (
               <p key={paragraph} className="leading-relaxed text-muted-foreground">
                 {paragraph}
               </p>
