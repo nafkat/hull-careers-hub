@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Megaphone } from "lucide-react";
 import { listSocialPosts, type SocialPostRow } from "@/lib/admin.functions";
 import {
   Table,
@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Rivets } from "@/components/industrial";
-import { NauticalSpinner } from "@/components/nautical-spinner";
+import { SkeletonRows } from "@/components/skeleton-card";
 
 function statusBadge(status: string) {
   const pill =
@@ -33,7 +33,7 @@ export function SocialPostsPanel() {
     refetchInterval: 30000,
   });
 
-  if (query.isLoading) return <NauticalSpinner label="Loading social history" />;
+  if (query.isLoading) return <SkeletonRows count={5} />;
   const posts: SocialPostRow[] = query.data?.posts ?? [];
 
   return (
@@ -41,7 +41,7 @@ export function SocialPostsPanel() {
       <h2 className="font-display text-2xl tracking-[2px]">Social posts</h2>
       <div className="metal-plate relative overflow-x-auto">
         <Rivets />
-        <Table className="steel-table">
+        <Table className="steel-table min-w-[640px]">
           <TableHeader>
             <TableRow>
               <TableHead>Job</TableHead>
@@ -55,8 +55,9 @@ export function SocialPostsPanel() {
           <TableBody>
             {posts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
-                  No social posts yet.
+                <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
+                  <Megaphone className="mx-auto mb-3 size-12 opacity-60" aria-hidden />
+                  No social posts yet. Publish a job to see history here.
                 </TableCell>
               </TableRow>
             )}
