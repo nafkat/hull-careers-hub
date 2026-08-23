@@ -237,7 +237,7 @@ export function ApplyModal({
             <DialogHeader>
               <DialogTitle className="font-display text-2xl">Apply — {job.title}</DialogTitle>
               <DialogDescription>
-                {job.location} · {job.employmentType}
+                {job.location} · {job.employment_type}
               </DialogDescription>
             </DialogHeader>
 
