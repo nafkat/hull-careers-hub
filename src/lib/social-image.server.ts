@@ -22,7 +22,7 @@ async function ensureWasm(origin: string | null) {
   const { initWasm } = await import("@resvg/resvg-wasm");
   if (!wasmReady) {
     wasmReady = (async () => {
-      const response = await fetch(assetUrl(origin, wasmUrl));
+      const response = await fetch(assetUrl(origin, WASM_PATH));
       if (!response.ok) throw new Error(`Could not load renderer (${response.status})`);
       await initWasm(await response.arrayBuffer());
     })().catch((error) => {
