@@ -326,6 +326,7 @@ export const saveSettings = createServerFn({ method: "POST" })
       .from("app_settings")
       .update({
         ...data,
+        social_api_keys: data.social_api_keys as Record<string, string>,
         clamav_api_url: data.clamav_api_url ? data.clamav_api_url : null,
         updated_at: new Date().toISOString(),
       })
