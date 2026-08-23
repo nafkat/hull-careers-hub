@@ -20,6 +20,7 @@ const submitSchema = z.object({
 export type SubmitResult =
   | { status: "clean"; applicationId: string; emailSent: boolean }
   | { status: "infected" }
+  | { status: "scan-error"; applicationId: string }
   | { status: "error"; message: string };
 
 export const submitApplication = createServerFn({ method: "POST" })
@@ -27,10 +28,13 @@ export const submitApplication = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<SubmitResult> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { sendConfirmationEmail, renderTemplate } = await import("./notifications.server");
+    const { hasValidMagicBytes, quarantineFile, scanBytes } = await import("./scan.server");
 
     const { data: settings } = await supabaseAdmin
       .from("app_settings")
-      .select("max_file_size_mb, email_from, email_subject, email_body_template, virus_scan_enabled")
+      .select(
+        "max_file_size_mb, email_from, email_subject, email_body_template, virus_scan_enabled, clamav_api_url, rate_limit_per_day",
+      )
       .eq("id", true)
       .maybeSingle();
 
@@ -38,6 +42,22 @@ export const submitApplication = createServerFn({ method: "POST" })
     const isDocx = data.fileName.toLowerCase().endsWith(".docx");
     if (!ALLOWED_MIME.includes(data.fileMimeType) && !isDocx) {
       return { status: "error", message: "Only PDF and DOCX files are accepted." };
+    }
+
+    // Rate limit: max N applications per email per rolling 24 hours.
+    const limit = settings?.rate_limit_per_day ?? 3;
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { count: recentCount } = await supabaseAdmin
+      .from("applications")
+      .select("id", { count: "exact", head: true })
+      .eq("email", data.email)
+      .gte("created_at", since);
+
+    if ((recentCount ?? 0) >= limit) {
+      return {
+        status: "error",
+        message: `You have reached the daily application limit (${limit} per day). Please try again tomorrow.`,
+      };
     }
 
     let bytes: Uint8Array;
@@ -48,6 +68,14 @@ export const submitApplication = createServerFn({ method: "POST" })
     }
     if (bytes.byteLength === 0 || bytes.byteLength > maxBytes) {
       return { status: "error", message: "File exceeds the allowed size." };
+    }
+
+    // Magic-byte verification blocks renamed executables and archives.
+    if (!hasValidMagicBytes(bytes, isDocx)) {
+      return {
+        status: "error",
+        message: "File format verification failed. Only genuine PDF and DOCX files are accepted.",
+      };
     }
 
     const { data: job } = await supabaseAdmin
@@ -97,17 +125,26 @@ export const submitApplication = createServerFn({ method: "POST" })
       return { status: "error", message: "The file upload failed. Please try again." };
     }
 
-    // Simulated scan: files whose name signals malware are quarantined.
-    const scanEnabled = settings?.virus_scan_enabled ?? true;
-    const infected = scanEnabled && /virus|malware|infected|eicar/i.test(data.fileName);
+    const scan = (settings?.virus_scan_enabled ?? true)
+      ? await scanBytes({ bytes, fileName: data.fileName, clamavUrl: settings?.clamav_api_url })
+      : ({ status: "clean", details: "Scanning disabled" } as const);
 
-    if (infected) {
-      await supabaseAdmin.storage.from("cv-uploads").remove([path]);
+    if (scan.status === "infected") {
+      await quarantineFile(path);
       await supabaseAdmin
         .from("applications")
         .update({ virus_scan_status: "infected", file_path: null })
         .eq("id", application.id);
       return { status: "infected" };
+    }
+
+    if (scan.status === "error") {
+      console.error("[applications] scan error", scan.details);
+      await supabaseAdmin
+        .from("applications")
+        .update({ virus_scan_status: "error", file_path: path })
+        .eq("id", application.id);
+      return { status: "scan-error", applicationId: application.id };
     }
 
     const body = renderTemplate(
