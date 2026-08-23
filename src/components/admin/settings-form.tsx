@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { NauticalSpinner } from "@/components/nautical-spinner";
+import { Rivets } from "@/components/industrial";
 
 const networks = [
   { id: "linkedin", label: "LinkedIn", extraKey: "linkedin_org_id", extraLabel: "Organization ID" },
@@ -115,16 +116,19 @@ export function SettingsForm() {
   return (
     <>
     <form
-      className="glass max-w-2xl space-y-5 rounded-xl p-6"
+      className="metal-plate relative max-w-2xl space-y-6 p-6"
       onSubmit={(event) => {
         event.preventDefault();
         mutation.mutate();
       }}
     >
+      <Rivets />
+      <h3 className="section-head">Delivery</h3>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="email-from">Email from address</Label>
+          <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="email-from">Email from address</Label>
           <Input
+            className="industrial-input px-0"
             id="email-from"
             type="email"
             value={form.email_from}
@@ -132,8 +136,9 @@ export function SettingsForm() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="max-size">Max file size (MB)</Label>
+          <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="max-size">Max file size (MB)</Label>
           <Input
+            className="industrial-input px-0"
             id="max-size"
             type="number"
             min={1}
@@ -145,8 +150,9 @@ export function SettingsForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email-subject">Confirmation subject</Label>
+        <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="email-subject">Confirmation subject</Label>
         <Input
+          className="industrial-input px-0"
           id="email-subject"
           value={form.email_subject}
           onChange={(e) => setForm({ ...form, email_subject: e.target.value })}
@@ -154,8 +160,9 @@ export function SettingsForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email-body">Confirmation body</Label>
+        <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="email-body">Confirmation body</Label>
         <Textarea
+          className="industrial-input px-0"
           id="email-body"
           rows={5}
           value={form.email_body_template}
@@ -166,9 +173,11 @@ export function SettingsForm() {
         </p>
       </div>
 
+      <h3 className="section-head">Scanning &amp; limits</h3>
       <div className="space-y-2">
-        <Label htmlFor="clamav-url">ClamAV API URL</Label>
+        <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="clamav-url">ClamAV API URL</Label>
         <Input
+          className="industrial-input px-0"
           id="clamav-url"
           type="url"
           placeholder="https://your-clamav-host/scan"
@@ -181,8 +190,9 @@ export function SettingsForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="rate-limit">Applications per day (per email)</Label>
+        <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor="rate-limit">Applications per day (per email)</Label>
         <Input
+          className="industrial-input px-0"
           id="rate-limit"
           type="number"
           min={1}
@@ -201,7 +211,7 @@ export function SettingsForm() {
       </label>
 
       <div className="space-y-4">
-        <h3 className="font-display text-lg">Social media API keys</h3>
+        <h3 className="section-head">Social media API keys</h3>
         {networks.map((network) => {
           const state = connections[network.id];
           const configured = Boolean(form.social_api_keys[network.id]);
@@ -215,10 +225,11 @@ export function SettingsForm() {
             <div key={network.id} className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className={`inline-block size-2 rounded-full ${dotClass}`} />
-                <Label htmlFor={`key-${network.id}`}>{network.label}</Label>
+                <Label className="font-mono text-[11px] tracking-[2px] uppercase" htmlFor={`key-${network.id}`}>{network.label}</Label>
               </div>
               <div className="flex gap-2">
                 <Input
+                  className="industrial-input px-0"
                   id={`key-${network.id}`}
                   type="password"
                   placeholder="Access token — not configured"
@@ -236,6 +247,7 @@ export function SettingsForm() {
                 <Button
                   type="button"
                   variant="outline"
+                  className="hover:border-primary"
                   disabled={connectionMutation.isPending}
                   onClick={() => connectionMutation.mutate(network.id)}
                 >
@@ -243,6 +255,7 @@ export function SettingsForm() {
                 </Button>
               </div>
               <Input
+                className="industrial-input px-0"
                 id={`extra-${network.id}`}
                 placeholder={network.extraLabel}
                 value={form.social_api_keys[network.extraKey] ?? ""}
@@ -271,6 +284,7 @@ export function SettingsForm() {
         <Button
           type="button"
           variant="outline"
+          className="hover:border-primary"
           disabled={testMutation.isPending}
           onClick={() => testMutation.mutate()}
         >
@@ -279,6 +293,7 @@ export function SettingsForm() {
         <Button
           type="button"
           variant="outline"
+          className="hover:border-primary"
           disabled={previewMutation.isPending}
           onClick={() => previewMutation.mutate()}
         >
@@ -288,9 +303,9 @@ export function SettingsForm() {
     </form>
 
     <Dialog open={preview !== null} onOpenChange={() => setPreview(null)}>
-      <DialogContent className="glass border-border/60 sm:max-w-2xl">
+      <DialogContent className="metal-plate sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl">Confirmation email preview</DialogTitle>
+          <DialogTitle className="font-display text-2xl tracking-[2px]">Confirmation email preview</DialogTitle>
           <DialogDescription>
             Sample applicant: Μαρία Παπαδοπούλου — Naval Architect, Engineering, Piraeus, Greece
           </DialogDescription>
