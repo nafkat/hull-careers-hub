@@ -222,7 +222,7 @@ export const saveJob = createServerFn({ method: "POST" })
       socialPosted = results.some((result) => result.posted);
     }
 
-    return { ok: true as const, jobId, socialPosted };
+    return { ok: true as const, jobId, socialPosted, socialResults };
   });
 
 export const updateApplicationFlags = createServerFn({ method: "POST" })
