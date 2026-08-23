@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "sdk_version": "0.27.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "hull-careers-hub",
+      "version": "0.1.0",
+      "title": "Hull Careers Hub"
+    },
+    "tools": [
+      {
+        "name": "list_open_jobs",
+        "title": "List open jobs",
+        "description": "List the currently active, publicly advertised job openings at EUROHULL Shipyards. Optionally filter by department or location text.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "department": {
+              "description": "Filter by department, e.g. Engineering.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "location": {
+              "description": "Case-insensitive location substring.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "limit": {
+              "description": "Maximum rows to return (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_job",
+        "title": "Get job details",
+        "description": "Get the full public description, requirements and application link for one active EUROHULL job listing, identified by its slug.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "slug": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Job slug, as returned by list_open_jobs."
+            }
+          },
+          "required": [
+            "slug"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
