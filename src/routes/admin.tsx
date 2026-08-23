@@ -215,8 +215,10 @@ function AdminConsole() {
               <Plus className="size-4" /> New position
             </Button>
           </div>
-          <div className="glass overflow-x-auto rounded-xl">
-            <Table>
+          <div className="metal-plate relative overflow-x-auto">
+            <Rivets />
+            <Table className="steel-table">
+
               <TableHeader>
                 <TableRow>
                   <TableHead>Title</TableHead>
