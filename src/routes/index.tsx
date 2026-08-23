@@ -33,6 +33,8 @@ const pillars = [
 ];
 
 function Landing() {
+  const { jobs } = Route.useLoaderData();
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
