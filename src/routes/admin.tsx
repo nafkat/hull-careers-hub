@@ -16,6 +16,8 @@ import { ApplicationsPanel } from "@/components/admin/applications-panel";
 import { SettingsForm } from "@/components/admin/settings-form";
 import { SocialPostsPanel } from "@/components/admin/social-posts-panel";
 import { NauticalSpinner } from "@/components/nautical-spinner";
+import { Rivets } from "@/components/industrial";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
