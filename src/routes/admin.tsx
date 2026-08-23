@@ -180,8 +180,8 @@ function AdminConsole() {
     <div className="page-enter mx-auto min-h-screen w-full max-w-6xl px-5 py-10">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs tracking-[0.35em] text-gold uppercase">EUROHULL</p>
-          <h1 className="mt-2 font-display text-4xl">Recruitment console</h1>
+          <p className="font-mono text-[11px] tracking-[4px] text-primary uppercase">EUROHULL</p>
+          <h1 className="mt-2 font-display text-[32px] tracking-[3px]">Recruitment console</h1>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
@@ -200,12 +200,13 @@ function AdminConsole() {
       </div>
 
       <Tabs defaultValue="jobs" className="mt-10">
-        <TabsList>
-          <TabsTrigger value="jobs">Jobs</TabsTrigger>
-          <TabsTrigger value="applications">Applications</TabsTrigger>
-          <TabsTrigger value="social">Social posts</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+        <TabsList className="h-auto w-full justify-start gap-6 rounded-none border-b-2 border-steel/50 bg-transparent p-0">
+          <TabsTrigger value="jobs" className="tab-steel px-1 pb-3">Jobs</TabsTrigger>
+          <TabsTrigger value="applications" className="tab-steel px-1 pb-3">Applications</TabsTrigger>
+          <TabsTrigger value="social" className="tab-steel px-1 pb-3">Social posts</TabsTrigger>
+          <TabsTrigger value="settings" className="tab-steel px-1 pb-3">Settings</TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="jobs" className="mt-6 space-y-4">
           <div className="flex items-center justify-between">
