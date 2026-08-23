@@ -12,6 +12,7 @@ export default defineTool({
     location: z.string().trim().min(1).max(80).optional().describe("Case-insensitive location substring."),
     limit: z.number().int().min(1).max(50).optional().describe("Maximum rows to return (default 20)."),
   },
+  outputSchema: { jobs: z.array(z.record(z.string(), z.unknown())) },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ department, location, limit }) => {
     const supabase = supabaseAnon();

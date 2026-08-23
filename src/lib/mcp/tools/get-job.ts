@@ -10,6 +10,7 @@ export default defineTool({
   inputSchema: {
     slug: z.string().trim().min(1).max(200).describe("Job slug, as returned by list_open_jobs."),
   },
+  outputSchema: { job: z.record(z.string(), z.unknown()), applyPath: z.string() },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ slug }) => {
     const supabase = supabaseAnon();
