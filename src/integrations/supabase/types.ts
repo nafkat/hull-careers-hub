@@ -17,33 +17,39 @@ export type Database = {
       app_settings: {
         Row: {
           admin_password_hash: string | null
+          clamav_api_url: string | null
           email_body_template: string
           email_from: string
           email_subject: string
           id: boolean
           max_file_size_mb: number
+          rate_limit_per_day: number
           social_api_keys: Json
           updated_at: string
           virus_scan_enabled: boolean
         }
         Insert: {
           admin_password_hash?: string | null
+          clamav_api_url?: string | null
           email_body_template?: string
           email_from?: string
           email_subject?: string
           id?: boolean
           max_file_size_mb?: number
+          rate_limit_per_day?: number
           social_api_keys?: Json
           updated_at?: string
           virus_scan_enabled?: boolean
         }
         Update: {
           admin_password_hash?: string | null
+          clamav_api_url?: string | null
           email_body_template?: string
           email_from?: string
           email_subject?: string
           id?: boolean
           max_file_size_mb?: number
+          rate_limit_per_day?: number
           social_api_keys?: Json
           updated_at?: string
           virus_scan_enabled?: boolean
@@ -120,6 +126,9 @@ export type Database = {
           employment_type: string
           id: string
           location: string
+          posted_to_facebook: boolean
+          posted_to_instagram: boolean
+          posted_to_linkedin: boolean
           requirements: string[]
           slug: string
           social_auto_post: boolean
@@ -135,6 +144,9 @@ export type Database = {
           employment_type?: string
           id?: string
           location?: string
+          posted_to_facebook?: boolean
+          posted_to_instagram?: boolean
+          posted_to_linkedin?: boolean
           requirements?: string[]
           slug: string
           social_auto_post?: boolean
@@ -150,6 +162,9 @@ export type Database = {
           employment_type?: string
           id?: string
           location?: string
+          posted_to_facebook?: boolean
+          posted_to_instagram?: boolean
+          posted_to_linkedin?: boolean
           requirements?: string[]
           slug?: string
           social_auto_post?: boolean
@@ -159,6 +174,44 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      social_posts: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          job_listing_id: string | null
+          platform: string
+          post_url: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          job_listing_id?: string | null
+          platform: string
+          post_url?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          job_listing_id?: string | null
+          platform?: string
+          post_url?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_job_listing_id_fkey"
+            columns: ["job_listing_id"]
+            isOneToOne: false
+            referencedRelation: "job_listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

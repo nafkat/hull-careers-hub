@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   getCvDownloadUrl,
+  rescanApplication,
   updateApplicationFlags,
   type AdminApplication,
   type AdminJob,
@@ -25,7 +26,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Download, Archive, MailOpen } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Download, Archive, MailOpen, ShieldAlert, RefreshCw } from "lucide-react";
+
+function formatFileSize(bytes: number | null) {
+  if (!bytes) return "—";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 function scanBadge(status: string) {
   if (status === "clean") return <Badge className="bg-success/15 text-success">Clean</Badge>;
@@ -43,8 +59,11 @@ export function ApplicationsPanel({
 }) {
   const [selected, setSelected] = useState<AdminApplication | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [scanFilter, setScanFilter] = useState<string>("all");
+  const [search, setSearch] = useState("");
   const queryClient = useQueryClient();
   const setFlags = useServerFn(updateApplicationFlags);
+  const rescan = useServerFn(rescanApplication);
   const download = useServerFn(getCvDownloadUrl);
 
   const flagMutation = useMutation({
@@ -64,11 +83,47 @@ export function ApplicationsPanel({
     },
   });
 
-  const visible = applications.filter((application) => application.is_archived === showArchived);
+  const rescanMutation = useMutation({
+    mutationFn: (id: string) => rescan({ data: { id } }),
+    onSuccess: (result) => {
+      if (result.status === "clean") toast.success("Rescan complete — file is clean");
+      else if (result.status === "infected") toast.error("Rescan flagged a threat — file quarantined");
+      else toast.error(result.details ?? "Scan error");
+      setSelected(null);
+      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+    },
+    onError: () => toast.error("Rescan failed"),
+  });
+
+  const term = search.trim().toLowerCase();
+  const visible = applications.filter(
+    (application) =>
+      application.is_archived === showArchived &&
+      (scanFilter === "all" || application.virus_scan_status === scanFilter) &&
+      (term === "" ||
+        application.full_name.toLowerCase().includes(term) ||
+        application.email.toLowerCase().includes(term)),
+  );
+
+  const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
+  const recentInfected = applications.filter(
+    (application) =>
+      application.virus_scan_status === "infected" &&
+      new Date(application.created_at).getTime() >= dayAgo,
+  ).length;
   const jobTitle = (id: string) => jobs.find((job) => job.id === id)?.title ?? "—";
 
   return (
     <div className="space-y-4">
+      {recentInfected > 0 && (
+        <div className="flex items-center gap-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
+          <ShieldAlert className="size-5 text-destructive" />
+          <span>
+            {recentInfected} application{recentInfected === 1 ? "" : "s"} flagged as infected in the
+            last 24 hours. The files were quarantined.
+          </span>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <h2 className="font-display text-2xl">
           {showArchived ? "Archived applications" : "Applications"}
@@ -76,6 +131,27 @@ export function ApplicationsPanel({
         <Button variant="outline" size="sm" onClick={() => setShowArchived((value) => !value)}>
           {showArchived ? "Show active" : "Show archived"}
         </Button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <Input
+          placeholder="Search by name or email"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="max-w-xs"
+        />
+        <Select value={scanFilter} onValueChange={setScanFilter}>
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="All scan states" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="clean">Clean</SelectItem>
+            <SelectItem value="infected">Infected</SelectItem>
+            <SelectItem value="error">Error</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="glass overflow-x-auto rounded-xl">
@@ -193,7 +269,7 @@ export function ApplicationsPanel({
                   <dt className="text-muted-foreground">CV</dt>
                   <dd>
                     {selected.file_name ?? "—"}
-                    {selected.file_size ? ` · ${(selected.file_size / 1024).toFixed(0)} KB` : ""}
+                    {selected.file_size ? ` · ${formatFileSize(selected.file_size)}` : ""}
                   </dd>
                 </div>
                 <div className="flex items-center gap-2">
@@ -201,13 +277,23 @@ export function ApplicationsPanel({
                   {selected.email_sent && <Badge variant="secondary">Confirmation sent</Badge>}
                 </div>
               </dl>
-              <Button
-                variant="rust"
-                disabled={selected.virus_scan_status !== "clean"}
-                onClick={() => downloadMutation.mutate(selected.id)}
-              >
-                <Download className="size-4" /> Download CV
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="rust"
+                  disabled={selected.virus_scan_status !== "clean"}
+                  onClick={() => downloadMutation.mutate(selected.id)}
+                >
+                  <Download className="size-4" /> Download CV
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={!selected.file_path || rescanMutation.isPending}
+                  onClick={() => rescanMutation.mutate(selected.id)}
+                >
+                  <RefreshCw className="size-4" />
+                  {rescanMutation.isPending ? "Rescanning…" : "Rescan file"}
+                </Button>
+              </div>
             </>
           )}
         </DialogContent>

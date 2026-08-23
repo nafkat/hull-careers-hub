@@ -41,6 +41,8 @@ export type AdminSettings = {
   email_body_template: string;
   virus_scan_enabled: boolean;
   social_api_keys: Record<string, string>;
+  clamav_api_url: string | null;
+  rate_limit_per_day: number;
 };
 
 const jobSchema = z.object({
@@ -171,17 +173,36 @@ export const saveJob = createServerFn({ method: "POST" })
         .select("slug")
         .eq("id", jobId)
         .maybeSingle();
-      await postJobToSocials({
+      const results = await postJobToSocials({
         title: data.title,
         location: data.location,
         url: `https://eurohull.com/jobs/${job?.slug ?? ""}`,
         keys: (settings?.social_api_keys ?? {}) as Record<string, string | undefined>,
       });
+
+      await supabaseAdmin.from("social_posts").insert(
+        results.map((result) => ({
+          job_listing_id: jobId,
+          platform: result.network,
+          post_url: result.postUrl ?? null,
+          status: result.posted ? "success" : "failed",
+          error_message: result.error ?? null,
+        })),
+      );
+
+      const flagFor = (network: string) =>
+        results.some((result) => result.network === network && result.posted);
+
       await supabaseAdmin
         .from("job_listings")
-        .update({ social_posted_at: new Date().toISOString() })
+        .update({
+          social_posted_at: new Date().toISOString(),
+          posted_to_linkedin: flagFor("linkedin"),
+          posted_to_facebook: flagFor("facebook"),
+          posted_to_instagram: flagFor("instagram"),
+        })
         .eq("id", jobId);
-      socialPosted = true;
+      socialPosted = results.some((result) => result.posted);
     }
 
     return { ok: true as const, jobId, socialPosted };
@@ -239,7 +260,9 @@ export const getSettings = createServerFn({ method: "GET" }).handler(async () =>
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("app_settings")
-    .select("max_file_size_mb, email_from, email_subject, email_body_template, virus_scan_enabled, social_api_keys")
+    .select(
+      "max_file_size_mb, email_from, email_subject, email_body_template, virus_scan_enabled, social_api_keys, clamav_api_url, rate_limit_per_day",
+    )
     .eq("id", true)
     .maybeSingle();
   return { settings: (data ?? null) as AdminSettings | null };
@@ -255,6 +278,8 @@ export const saveSettings = createServerFn({ method: "POST" })
         email_body_template: z.string().trim().min(1).max(4000),
         virus_scan_enabled: z.boolean(),
         social_api_keys: z.record(z.string().max(300)),
+        clamav_api_url: z.string().trim().url().max(500).nullable().or(z.literal("")),
+        rate_limit_per_day: z.number().int().min(1).max(50),
       })
       .parse(data),
   )
@@ -264,7 +289,84 @@ export const saveSettings = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("app_settings")
-      .update({ ...data, updated_at: new Date().toISOString() })
+      .update({
+        ...data,
+        clamav_api_url: data.clamav_api_url ? data.clamav_api_url : null,
+        updated_at: new Date().toISOString(),
+      })
       .eq("id", true);
     return { ok: !error, message: error?.message ?? null };
   });
+
+export const rescanApplication = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data }) => {
+    const { requireAdmin } = await import("./admin-session.server");
+    await requireAdmin();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { scanStoredFile, quarantineFile, readScannerConfig } = await import("./scan.server");
+
+    const { data: application } = await supabaseAdmin
+      .from("applications")
+      .select("id, file_path")
+      .eq("id", data.id)
+      .maybeSingle();
+
+    if (!application?.file_path) {
+      return { status: "error" as const, details: "No stored file to rescan." };
+    }
+
+    const { clamavUrl } = await readScannerConfig();
+    const result = await scanStoredFile(application.file_path, clamavUrl);
+
+    if (result.status === "infected") {
+      await quarantineFile(application.file_path);
+      await supabaseAdmin
+        .from("applications")
+        .update({ virus_scan_status: "infected", file_path: null })
+        .eq("id", application.id);
+    } else {
+      await supabaseAdmin
+        .from("applications")
+        .update({ virus_scan_status: result.status })
+        .eq("id", application.id);
+    }
+
+    return { status: result.status, details: result.details };
+  });
+
+/** Uploads a tiny generated PDF and runs it through the configured scanner. */
+export const testScan = createServerFn({ method: "POST" }).handler(async () => {
+  const { requireAdmin } = await import("./admin-session.server");
+  await requireAdmin();
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { scanBytes, readScannerConfig } = await import("./scan.server");
+
+  const bytes = new TextEncoder().encode("%PDF-1.4\nEUROHULL scanner test file\n%%EOF\n");
+  const path = `diagnostics/test-scan-${Date.now()}.pdf`;
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from("cv-uploads")
+    .upload(path, bytes, { contentType: "application/pdf", upsert: true });
+
+  if (uploadError) {
+    return { status: "error" as const, details: uploadError.message };
+  }
+
+  const { clamavUrl } = await readScannerConfig();
+  const result = await scanBytes({ bytes, fileName: "test-scan.pdf", clamavUrl });
+  await supabaseAdmin.storage.from("cv-uploads").remove([path]);
+  return result;
+});
+
+/** Lightweight poll used by the admin console for near-real-time notifications. */
+export const latestApplications = createServerFn({ method: "GET" }).handler(async () => {
+  const { requireAdmin } = await import("./admin-session.server");
+  await requireAdmin();
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin
+    .from("applications")
+    .select("id, full_name, job_listing_id, created_at, is_read, is_archived, virus_scan_status")
+    .order("created_at", { ascending: false })
+    .limit(20);
+  return { applications: data ?? [] };
+});

@@ -41,7 +41,13 @@ export async function sendConfirmationEmail(input: {
   return { sent: true, mocked: false };
 }
 
-export type SocialResult = { network: string; posted: boolean; mocked: boolean };
+export type SocialResult = {
+  network: string;
+  posted: boolean;
+  mocked: boolean;
+  postUrl?: string | null;
+  error?: string | null;
+};
 
 export async function postJobToSocials(input: {
   title: string;
@@ -56,10 +62,10 @@ export async function postJobToSocials(input: {
     const key = input.keys[network];
     if (!key) {
       console.info("[social:mock] %s -> %s", network, text);
-      return { network, posted: true, mocked: true };
+      return { network, posted: true, mocked: true, postUrl: input.url, error: null };
     }
     // Real network calls plug in here once credentials are configured.
     console.info("[social] %s configured, dispatching post", network);
-    return { network, posted: true, mocked: false };
+    return { network, posted: true, mocked: false, postUrl: input.url, error: null };
   });
 }

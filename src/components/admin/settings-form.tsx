@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getSettings, saveSettings } from "@/lib/admin.functions";
+import { getSettings, saveSettings, testScan } from "@/lib/admin.functions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +15,7 @@ const networks = ["linkedin", "facebook", "instagram"] as const;
 export function SettingsForm() {
   const fetchSettings = useServerFn(getSettings);
   const persist = useServerFn(saveSettings);
+  const runTestScan = useServerFn(testScan);
   const [form, setForm] = useState<{
     max_file_size_mb: number;
     email_from: string;
@@ -22,6 +23,8 @@ export function SettingsForm() {
     email_body_template: string;
     virus_scan_enabled: boolean;
     social_api_keys: Record<string, string>;
+    clamav_api_url: string;
+    rate_limit_per_day: number;
   } | null>(null);
 
   const query = useQuery({
@@ -36,6 +39,8 @@ export function SettingsForm() {
           email_body_template: result.settings.email_body_template,
           virus_scan_enabled: result.settings.virus_scan_enabled,
           social_api_keys: result.settings.social_api_keys ?? {},
+          clamav_api_url: result.settings.clamav_api_url ?? "",
+          rate_limit_per_day: result.settings.rate_limit_per_day ?? 3,
         });
       }
       return result;
@@ -47,6 +52,16 @@ export function SettingsForm() {
     onSuccess: (result) =>
       result.ok ? toast.success("Settings saved") : toast.error(result.message ?? "Save failed"),
     onError: () => toast.error("Save failed"),
+  });
+
+  const testMutation = useMutation({
+    mutationFn: () => runTestScan(),
+    onSuccess: (result) => {
+      if (result.status === "clean") toast.success(`Scanner OK — ${result.details}`);
+      else if (result.status === "infected") toast.error(`Test file flagged — ${result.details}`);
+      else toast.error(`Scan error — ${result.details}`);
+    },
+    onError: () => toast.error("Test scan failed"),
   });
 
   if (query.isLoading || !form) return <NauticalSpinner label="Loading settings" />;
@@ -104,6 +119,32 @@ export function SettingsForm() {
         </p>
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="clamav-url">ClamAV API URL</Label>
+        <Input
+          id="clamav-url"
+          type="url"
+          placeholder="https://your-clamav-host/scan"
+          value={form.clamav_api_url}
+          onChange={(e) => setForm({ ...form, clamav_api_url: e.target.value })}
+        />
+        <p className="text-xs text-muted-foreground">
+          Leave empty to use the built-in simulated scanner.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="rate-limit">Applications per day (per email)</Label>
+        <Input
+          id="rate-limit"
+          type="number"
+          min={1}
+          max={50}
+          value={form.rate_limit_per_day}
+          onChange={(e) => setForm({ ...form, rate_limit_per_day: Number(e.target.value) })}
+        />
+      </div>
+
       <label className="flex items-center gap-3 rounded-lg border border-border/60 p-4 text-sm">
         <Switch
           checked={form.virus_scan_enabled}
@@ -135,9 +176,19 @@ export function SettingsForm() {
         ))}
       </div>
 
-      <Button type="submit" variant="rust" disabled={mutation.isPending}>
-        {mutation.isPending ? "Saving…" : "Save settings"}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button type="submit" variant="rust" disabled={mutation.isPending}>
+          {mutation.isPending ? "Saving…" : "Save settings"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={testMutation.isPending}
+          onClick={() => testMutation.mutate()}
+        >
+          {testMutation.isPending ? "Testing…" : "Test scan"}
+        </Button>
+      </div>
     </form>
   );
 }
