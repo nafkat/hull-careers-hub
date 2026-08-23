@@ -27,7 +27,9 @@ export const submitApplication = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => submitSchema.parse(data))
   .handler(async ({ data }): Promise<SubmitResult> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendConfirmationEmail, renderTemplate } = await import("./notifications.server");
+    const { sendConfirmationEmail, renderTemplate, buildConfirmationEmailHtml } = await import(
+      "./notifications.server"
+    );
     const { hasValidMagicBytes, quarantineFile, scanBytes } = await import("./scan.server");
 
     const { data: settings } = await supabaseAdmin
