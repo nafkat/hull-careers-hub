@@ -16,6 +16,8 @@ import { ApplicationsPanel } from "@/components/admin/applications-panel";
 import { SettingsForm } from "@/components/admin/settings-form";
 import { SocialPostsPanel } from "@/components/admin/social-posts-panel";
 import { NauticalSpinner } from "@/components/nautical-spinner";
+import { Rivets } from "@/components/industrial";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -76,39 +78,53 @@ function PasswordGate() {
   });
 
   return (
-    <div className="grid min-h-screen place-items-center px-5">
+    <div className="grid-bg grid min-h-screen place-items-center px-5">
       <form
-        className="glass page-enter w-full max-w-sm space-y-5 rounded-xl p-8"
+        className="metal-plate page-enter relative w-full max-w-sm space-y-6 p-8"
         onSubmit={(event) => {
           event.preventDefault();
           mutation.mutate();
         }}
       >
+        <Rivets />
         <div className="flex flex-col items-center gap-3 text-center">
-          <Anchor className="size-8 text-gold" />
-          <h1 className="font-display text-3xl">EUROHULL Admin</h1>
-          <p className="text-sm text-muted-foreground">Restricted to yard recruitment staff.</p>
+          <Anchor className="size-8 text-primary" />
+          <h1 className="font-display text-[32px] tracking-[4px]">EUROHULL ADMIN</h1>
+          <p className="font-mono text-[11px] tracking-[2px] text-muted-foreground uppercase">
+            Restricted to yard recruitment staff
+          </p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password" className="font-mono text-[11px] tracking-[2px] uppercase">
+            Password
+          </Label>
           <Input
             id="password"
             type="password"
             autoComplete="current-password"
+            className="!rounded-none !border-0 !border-b-2 !border-steel !bg-transparent px-0 !shadow-none focus-visible:!border-primary focus-visible:!ring-0"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
         </div>
-        <Button type="submit" variant="rust" className="w-full" disabled={mutation.isPending}>
+        <Button
+          type="submit"
+          className="w-full rounded-[2px] bg-primary font-mono tracking-[3px] text-primary-foreground uppercase hover:bg-primary/90"
+          disabled={mutation.isPending}
+        >
           {mutation.isPending ? "Checking…" : "Enter"}
         </Button>
-        <Link to="/" className="block text-center text-xs text-muted-foreground hover:text-gold">
+        <Link
+          to="/"
+          className="block text-center font-mono text-[10px] tracking-[2px] text-muted-foreground uppercase hover:text-primary"
+        >
           Back to careers site
         </Link>
       </form>
     </div>
   );
 }
+
 
 function AdminConsole() {
   const queryClient = useQueryClient();
@@ -164,8 +180,8 @@ function AdminConsole() {
     <div className="page-enter mx-auto min-h-screen w-full max-w-6xl px-5 py-10">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs tracking-[0.35em] text-gold uppercase">EUROHULL</p>
-          <h1 className="mt-2 font-display text-4xl">Recruitment console</h1>
+          <p className="font-mono text-[11px] tracking-[4px] text-primary uppercase">EUROHULL</p>
+          <h1 className="mt-2 font-display text-[32px] tracking-[3px]">Recruitment console</h1>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
@@ -184,12 +200,13 @@ function AdminConsole() {
       </div>
 
       <Tabs defaultValue="jobs" className="mt-10">
-        <TabsList>
-          <TabsTrigger value="jobs">Jobs</TabsTrigger>
-          <TabsTrigger value="applications">Applications</TabsTrigger>
-          <TabsTrigger value="social">Social posts</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+        <TabsList className="h-auto w-full justify-start gap-6 rounded-none border-b-2 border-steel/50 bg-transparent p-0">
+          <TabsTrigger value="jobs" className="tab-steel px-1 pb-3">Jobs</TabsTrigger>
+          <TabsTrigger value="applications" className="tab-steel px-1 pb-3">Applications</TabsTrigger>
+          <TabsTrigger value="social" className="tab-steel px-1 pb-3">Social posts</TabsTrigger>
+          <TabsTrigger value="settings" className="tab-steel px-1 pb-3">Settings</TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="jobs" className="mt-6 space-y-4">
           <div className="flex items-center justify-between">
@@ -198,8 +215,10 @@ function AdminConsole() {
               <Plus className="size-4" /> New position
             </Button>
           </div>
-          <div className="glass overflow-x-auto rounded-xl">
-            <Table>
+          <div className="metal-plate relative overflow-x-auto">
+            <Rivets />
+            <Table className="steel-table">
+
               <TableHeader>
                 <TableRow>
                   <TableHead>Title</TableHead>
@@ -221,13 +240,20 @@ function AdminConsole() {
                       {job.location}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={job.status === "active" ? "default" : "secondary"}
-                        className="capitalize"
+                      <span
+                        className={`inline-block rounded-[2px] border px-2 py-0.5 font-mono text-[10px] tracking-[1.5px] uppercase ${
+                          job.status === "active"
+                            ? "border-success/50 bg-success/10 text-success"
+                            : job.status === "closed"
+                              ? "border-destructive/50 bg-destructive/10 text-destructive"
+                              : "border-steel bg-muted/40 text-muted-foreground"
+                        }`}
                       >
                         {job.status}
-                      </Badge>
+                      </span>
                     </TableCell>
+
+
                     <TableCell className="hidden text-muted-foreground lg:table-cell">
                       {job.social_auto_post ? "On" : "Off"}
                     </TableCell>
@@ -293,10 +319,14 @@ function StatCard({
   value: number;
 }) {
   return (
-    <div className="glass glass-hover rounded-xl p-6">
-      <Icon className="size-5 text-gold" />
-      <p className="mt-4 font-display text-4xl">{value}</p>
-      <p className="mt-1 text-sm text-muted-foreground">{label}</p>
+    <div className="metal-plate plate-hover relative p-6">
+      <Rivets />
+      <Icon className="size-5 text-primary" />
+      <p className="mt-4 font-display text-[40px] leading-none tracking-[2px]">{value}</p>
+      <p className="mt-2 font-mono text-[11px] tracking-[2px] text-muted-foreground uppercase">
+        {label}
+      </p>
     </div>
+
   );
 }

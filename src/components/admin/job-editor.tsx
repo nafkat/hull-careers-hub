@@ -129,9 +129,9 @@ export function JobEditor({
 
   return (
     <Dialog open={draft !== null} onOpenChange={onOpenChange}>
-      <DialogContent className="glass max-h-[90vh] overflow-y-auto border-border/60 sm:max-w-2xl">
+      <DialogContent className="metal-plate max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl">
+          <DialogTitle className="font-display text-2xl tracking-[2px]">
             {form.id ? "Edit position" : "New position"}
           </DialogTitle>
           <DialogDescription>

@@ -34,6 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Rivets } from "@/components/industrial";
 import { Download, Archive, MailOpen, ShieldAlert, RefreshCw } from "lucide-react";
 
 function formatFileSize(bytes: number | null) {
@@ -43,11 +44,21 @@ function formatFileSize(bytes: number | null) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+const pill =
+  "inline-block rounded-[2px] border px-2 py-0.5 font-mono text-[10px] tracking-[1.5px] uppercase";
+
 function scanBadge(status: string) {
-  if (status === "clean") return <Badge className="bg-success/15 text-success">Clean</Badge>;
-  if (status === "infected") return <Badge variant="destructive">Threat</Badge>;
-  if (status === "error") return <Badge variant="secondary">Scan error</Badge>;
-  return <Badge variant="secondary">Pending</Badge>;
+  if (status === "clean")
+    return <span className={`${pill} border-success/50 bg-success/10 text-success`}>Clean</span>;
+  if (status === "infected")
+    return (
+      <span className={`${pill} border-destructive/60 bg-destructive/10 text-destructive`}>
+        Threat
+      </span>
+    );
+  if (status === "error")
+    return <span className={`${pill} border-steel bg-muted/40 text-muted-foreground`}>Scan error</span>;
+  return <span className={`${pill} border-accent/50 bg-accent/10 text-accent`}>Pending</span>;
 }
 
 export function ApplicationsPanel({
@@ -116,7 +127,7 @@ export function ApplicationsPanel({
   return (
     <div className="space-y-4">
       {recentInfected > 0 && (
-        <div className="flex items-center gap-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
+        <div className="flex items-center gap-3 rounded-[4px] border-2 border-destructive/60 bg-destructive/10 p-4 text-sm">
           <ShieldAlert className="size-5 text-destructive" />
           <span>
             {recentInfected} application{recentInfected === 1 ? "" : "s"} flagged as infected in the
@@ -125,7 +136,7 @@ export function ApplicationsPanel({
         </div>
       )}
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-2xl">
+        <h2 className="font-display text-2xl tracking-[2px]">
           {showArchived ? "Archived applications" : "Applications"}
         </h2>
         <Button variant="outline" size="sm" onClick={() => setShowArchived((value) => !value)}>
@@ -138,7 +149,7 @@ export function ApplicationsPanel({
           placeholder="Search by name or email"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          className="max-w-xs"
+          className="!rounded-none !border-0 !border-b-2 !border-steel !bg-transparent px-0 !shadow-none focus-visible:!border-primary focus-visible:!ring-0 max-w-xs"
         />
         <Select value={scanFilter} onValueChange={setScanFilter}>
           <SelectTrigger className="w-44">
@@ -154,8 +165,9 @@ export function ApplicationsPanel({
         </Select>
       </div>
 
-      <div className="glass overflow-x-auto rounded-xl">
-        <Table>
+      <div className="metal-plate relative overflow-x-auto">
+        <Rivets />
+        <Table className="steel-table">
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
@@ -242,7 +254,7 @@ export function ApplicationsPanel({
       </div>
 
       <Dialog open={selected !== null} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="glass border-border/60 sm:max-w-lg">
+        <DialogContent className="metal-plate sm:max-w-lg">
           {selected && (
             <>
               <DialogHeader>
