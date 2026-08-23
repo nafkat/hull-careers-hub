@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, Ship, Waves, Wrench } from "lucide-react";
-import { activeJobs } from "@/data/jobs";
+import { listActiveJobs } from "@/lib/jobs.functions";
 import { JobCard } from "@/components/job-card";
 import { OceanBackdrop } from "@/components/ocean-backdrop";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
+  loader: () => listActiveJobs(),
   head: () => ({
     meta: [
       { title: "EUROHULL Careers — Building the Future of Maritime" },
