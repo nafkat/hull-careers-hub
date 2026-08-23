@@ -78,6 +78,24 @@ export function SettingsForm() {
     onError: () => toast.error("Save failed"),
   });
 
+  const connectionMutation = useMutation({
+    mutationFn: (network: NetworkId) => testConnection({ data: { network } }),
+    onSuccess: (result) => {
+      const label = networks.find((entry) => entry.id === result.network)?.label ?? result.network;
+      setConnections((current) => ({ ...current, [result.network]: result.ok ? "ok" : "failed" }));
+      if (result.ok) toast.success(`${label} connected ✓`);
+      else toast.error(`${label} connection failed: ${result.message}`);
+    },
+    onError: () => toast.error("Connection test failed"),
+  });
+
+  const previewMutation = useMutation({
+    mutationFn: () =>
+      renderPreview({ data: { email_body_template: form?.email_body_template ?? "" } }),
+    onSuccess: (result) => setPreview(result.html),
+    onError: () => toast.error("Could not render the preview"),
+  });
+
   const testMutation = useMutation({
     mutationFn: () => runTestScan(),
     onSuccess: (result) => {
