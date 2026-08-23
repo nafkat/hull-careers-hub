@@ -82,7 +82,7 @@ export const submitApplication = createServerFn({ method: "POST" })
 
     const { data: job } = await supabaseAdmin
       .from("job_listings")
-      .select("id, title, status")
+      .select("id, title, status, department, location")
       .eq("id", data.jobId)
       .maybeSingle();
     if (!job || job.status !== "active") {
