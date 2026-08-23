@@ -312,7 +312,7 @@ export const saveSettings = createServerFn({ method: "POST" })
         email_subject: z.string().trim().min(1).max(200),
         email_body_template: z.string().trim().min(1).max(4000),
         virus_scan_enabled: z.boolean(),
-        social_api_keys: z.record(z.string().max(300)),
+        social_api_keys: z.record(z.string(), z.string().max(300)),
         clamav_api_url: z.string().trim().url().max(500).nullable().or(z.literal("")),
         rate_limit_per_day: z.number().int().min(1).max(50),
       })
@@ -326,6 +326,7 @@ export const saveSettings = createServerFn({ method: "POST" })
       .from("app_settings")
       .update({
         ...data,
+        social_api_keys: data.social_api_keys as Record<string, string>,
         clamav_api_url: data.clamav_api_url ? data.clamav_api_url : null,
         updated_at: new Date().toISOString(),
       })
