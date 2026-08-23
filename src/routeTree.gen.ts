@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ApiScanFileRouteImport } from './routes/api/scan-file'
+import { Route as ApiTmpCardRouteImport } from './routes/api/tmp-card'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsSlugRouteImport } from './routes/jobs.$slug'
 
@@ -30,6 +31,11 @@ const ApiScanFileRoute = ApiScanFileRouteImport.update({
   path: '/api/scan-file',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTmpCardRoute = ApiTmpCardRouteImport.update({
+  id: '/api/tmp-card',
+  path: '/api/tmp-card',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JobsIndexRoute = JobsIndexRouteImport.update({
   id: '/jobs/',
   path: '/jobs/',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/api/scan-file': typeof ApiScanFileRoute
+  '/api/tmp-card': typeof ApiTmpCardRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/jobs/': typeof JobsIndexRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/api/scan-file': typeof ApiScanFileRoute
+  '/api/tmp-card': typeof ApiTmpCardRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/jobs': typeof JobsIndexRoute
 }
@@ -60,21 +68,42 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/api/scan-file': typeof ApiScanFileRoute
+  '/api/tmp-card': typeof ApiTmpCardRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/jobs/': typeof JobsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/api/scan-file' | '/jobs/$slug' | '/jobs/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/api/scan-file'
+    | '/api/tmp-card'
+    | '/jobs/$slug'
+    | '/jobs/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/api/scan-file' | '/jobs/$slug' | '/jobs'
-  id: '__root__' | '/' | '/admin' | '/api/scan-file' | '/jobs/$slug' | '/jobs/'
+  to:
+    | '/'
+    | '/admin'
+    | '/api/scan-file'
+    | '/api/tmp-card'
+    | '/jobs/$slug'
+    | '/jobs'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/api/scan-file'
+    | '/api/tmp-card'
+    | '/jobs/$slug'
+    | '/jobs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   ApiScanFileRoute: typeof ApiScanFileRoute
+  ApiTmpCardRoute: typeof ApiTmpCardRoute
   JobsSlugRoute: typeof JobsSlugRoute
   JobsIndexRoute: typeof JobsIndexRoute
 }
@@ -102,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiScanFileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/tmp-card': {
+      id: '/api/tmp-card'
+      path: '/api/tmp-card'
+      fullPath: '/api/tmp-card'
+      preLoaderRoute: typeof ApiTmpCardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jobs/': {
       id: '/jobs/'
       path: '/jobs'
@@ -123,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   ApiScanFileRoute: ApiScanFileRoute,
+  ApiTmpCardRoute: ApiTmpCardRoute,
   JobsSlugRoute: JobsSlugRoute,
   JobsIndexRoute: JobsIndexRoute,
 }
