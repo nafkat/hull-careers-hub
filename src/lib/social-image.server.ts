@@ -4,7 +4,7 @@
  * stored in the private "social-images" bucket behind a short-lived signed URL
  * that Instagram fetches while the media container is created.
  */
-import wasmUrl from "@resvg/resvg-wasm/index_bg.wasm?url";
+const WASM_PATH = "/wasm/resvg.wasm";
 
 const GOLD = "#d4a853";
 const RUST = "#c2410c";
