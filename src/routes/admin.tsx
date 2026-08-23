@@ -14,6 +14,7 @@ import {
 import { JobEditor, draftFromJob, emptyDraft } from "@/components/admin/job-editor";
 import { ApplicationsPanel } from "@/components/admin/applications-panel";
 import { SettingsForm } from "@/components/admin/settings-form";
+import { SocialPostsPanel } from "@/components/admin/social-posts-panel";
 import { NauticalSpinner } from "@/components/nautical-spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -244,6 +245,10 @@ function AdminConsole() {
 
         <TabsContent value="applications" className="mt-6">
           <ApplicationsPanel jobs={jobs} applications={applications} />
+        </TabsContent>
+
+        <TabsContent value="social" className="mt-6">
+          <SocialPostsPanel />
         </TabsContent>
 
         <TabsContent value="settings" className="mt-6">
