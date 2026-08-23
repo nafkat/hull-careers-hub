@@ -1,4 +1,20 @@
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
+
+/** Pause CSS animations while the tab is hidden (saves battery/CPU). */
+export function useAnimationVisibilityPause() {
+  useEffect(() => {
+    const handler = () => {
+      document.body.style.setProperty(
+        "--animation-play-state",
+        document.hidden ? "paused" : "running",
+      );
+    };
+    handler();
+    document.addEventListener("visibilitychange", handler);
+    return () => document.removeEventListener("visibilitychange", handler);
+  }, []);
+}
 
 /** Four corner rivets for a metal plate. Purely decorative. */
 export function Rivets({ className }: { className?: string }) {
@@ -49,7 +65,9 @@ export function SparkBurst({ className }: { className?: string }) {
 
 /** Rotating spotlight beams + drifting dust motes for the hero. */
 export function YardAtmosphere() {
+  useAnimationVisibilityPause();
   const dust = Array.from({ length: 36 }, (_, i) => ({
+    mobileHidden: i >= 18,
     left: `${(i * 37) % 100}%`,
     top: `${(i * 53) % 100}%`,
     delay: `${(i % 15) * 1}s`,
@@ -60,7 +78,7 @@ export function YardAtmosphere() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
       <div className="absolute inset-0 bg-[linear-gradient(180deg,#132a49,#0b1f3a)]" />
-      <div className="beam-layer absolute -inset-[40%] opacity-70" />
+      <div className="beam-layer gpu absolute -inset-[40%] opacity-70" />
       <div
         className="beam-layer absolute -inset-[55%] opacity-40 [animation-direction:reverse] [animation-duration:38s]"
       />
@@ -68,7 +86,7 @@ export function YardAtmosphere() {
       {dust.map((d) => (
         <span
           key={`${d.left}-${d.top}-${d.delay}`}
-          className="dust-dot"
+          className={cn("dust-dot", d.mobileHidden && "hidden sm:block")}
           style={{
             left: d.left,
             top: d.top,
