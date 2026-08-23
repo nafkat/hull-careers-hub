@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Clock, ArrowUpRight } from "lucide-react";
-import { departmentAccent, type Job } from "@/data/jobs";
+import { departmentAccent } from "@/data/departments";
+import type { PublicJob } from "@/lib/jobs.functions";
 
-export function JobCard({ job }: { job: Job }) {
-  const accent = departmentAccent[job.department];
+export function JobCard({ job }: { job: PublicJob }) {
+  const accent = departmentAccent(job.department);
 
   return (
     <Link
@@ -35,7 +36,7 @@ export function JobCard({ job }: { job: Job }) {
           <MapPin className="size-3.5" /> {job.location}
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <Clock className="size-3.5" /> {job.employmentType}
+          <Clock className="size-3.5" /> {job.employment_type}
         </span>
       </div>
     </Link>
