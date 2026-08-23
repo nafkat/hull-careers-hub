@@ -31,7 +31,7 @@ async function callClamAv(url: string, bytes: Uint8Array, fileName: string): Pro
     method: "POST",
     headers: process.env["CLAMAV_API_KEY"]
       ? { Authorization: `Bearer ${process.env["CLAMAV_API_KEY"]}` }
-      : undefined,
+      : {},
     body: form,
   });
 
@@ -71,7 +71,7 @@ function simulateScan(fileName: string, bytes: Uint8Array): ScanOutcome {
 export async function scanBytes(input: {
   bytes: Uint8Array;
   fileName: string;
-  clamavUrl?: string | null;
+  clamavUrl?: string | null | undefined;
 }): Promise<ScanOutcome> {
   const url = input.clamavUrl?.trim() || process.env["CLAMAV_API_URL"]?.trim();
   if (!url) return simulateScan(input.fileName, input.bytes);
@@ -84,7 +84,7 @@ export async function scanBytes(input: {
 }
 
 /** Downloads a stored object and scans it. */
-export async function scanStoredFile(filePath: string, clamavUrl?: string | null): Promise<ScanOutcome> {
+export async function scanStoredFile(filePath: string, clamavUrl?: string | null | undefined): Promise<ScanOutcome> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin.storage.from(UPLOAD_BUCKET).download(filePath);
   if (error || !data) return { status: "error", details: error?.message ?? "File not found" };
