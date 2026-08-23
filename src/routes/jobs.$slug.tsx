@@ -67,26 +67,20 @@ function JobDetail() {
         </Link>
 
         <div className="mt-8">
-          <span
-            className="inline-block rounded-full px-3 py-1 text-xs font-medium"
-            style={{
-              color: accent,
-              backgroundColor: `color-mix(in oklab, ${accent} 16%, transparent)`,
-              border: `1px solid color-mix(in oklab, ${accent} 35%, transparent)`,
-            }}
-          >
+          <span className="stamp inline-block" style={{ color: accent, borderColor: accent }}>
             {job.department}
           </span>
         </div>
 
+        <h1 className="mt-4 font-display text-[clamp(2rem,6vw,42px)] leading-tight tracking-[2px] uppercase">
+          {job.title}
+        </h1>
 
-        <h1 className="mt-4 font-display text-4xl leading-tight sm:text-5xl">{job.title}</h1>
-
-        <div className="mt-5 flex flex-wrap gap-5 text-sm text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5">
+        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 divide-x divide-white/10 font-mono text-[11px] tracking-[2px] text-muted-foreground uppercase">
+          <span className="inline-flex items-center gap-1.5 pr-5">
             <MapPin className="size-4" /> {job.location}
           </span>
-          <span className="inline-flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-1.5 pr-5">
             <Clock className="size-4" /> {job.employment_type}
           </span>
           <span className="inline-flex items-center gap-1.5">
@@ -94,7 +88,8 @@ function JobDetail() {
           </span>
         </div>
 
-        <div className="glass mt-10 space-y-8 rounded-xl p-7">
+        <div className="metal-plate relative mt-10 space-y-8 p-8">
+          <Rivets />
           <section className="space-y-4">
             <h2 className="font-display text-2xl">About the role</h2>
             {job.description.split(/\n{2,}/).map((paragraph) => (
@@ -106,20 +101,27 @@ function JobDetail() {
 
           <section className="space-y-3">
             <h2 className="font-display text-2xl">What we're looking for</h2>
-            <ul className="space-y-2">
+            <ul className="space-y-2 border-l-2 border-[#1E3A5F] pl-5">
               {job.requirements.map((requirement) => (
                 <li key={requirement} className="flex gap-3 text-muted-foreground">
-                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-gold" />
+                  <span className="mt-2 size-1.5 shrink-0 bg-primary" />
                   <span>{requirement}</span>
                 </li>
               ))}
             </ul>
           </section>
 
-          <Button variant="rust" size="lg" className="w-full sm:w-auto" onClick={() => setOpen(true)}>
-            Apply Now
-          </Button>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="weld-underline group relative w-full border-2 border-primary bg-card px-8 py-4 font-display text-sm tracking-[3px] text-foreground uppercase transition-colors hover:bg-primary/10"
+            style={{ borderRadius: 2 }}
+          >
+            <Rivets />
+            Apply now
+          </button>
         </div>
+
       </main>
       <SiteFooter />
       <ApplyModal job={job} open={open} onOpenChange={setOpen} />
