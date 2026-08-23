@@ -27,7 +27,9 @@ export const submitApplication = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => submitSchema.parse(data))
   .handler(async ({ data }): Promise<SubmitResult> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendConfirmationEmail, renderTemplate } = await import("./notifications.server");
+    const { sendConfirmationEmail, renderTemplate, buildConfirmationEmailHtml } = await import(
+      "./notifications.server"
+    );
     const { hasValidMagicBytes, quarantineFile, scanBytes } = await import("./scan.server");
 
     const { data: settings } = await supabaseAdmin
@@ -80,7 +82,7 @@ export const submitApplication = createServerFn({ method: "POST" })
 
     const { data: job } = await supabaseAdmin
       .from("job_listings")
-      .select("id, title, status")
+      .select("id, title, status, department, location")
       .eq("id", data.jobId)
       .maybeSingle();
     if (!job || job.status !== "active") {
@@ -147,18 +149,21 @@ export const submitApplication = createServerFn({ method: "POST" })
       return { status: "scan-error", applicationId: application.id };
     }
 
-    const body = renderTemplate(
-      settings?.email_body_template ??
-        "Thank you {{full_name}}, we received your application for {{job_title}}.",
-      { full_name: data.fullName, job_title: job.title },
-    );
+    const emailVars = {
+      full_name: data.fullName,
+      job_title: job.title,
+      department: job.department ?? "",
+      location: job.location ?? "",
+      date: new Date().toLocaleDateString("el-GR"),
+    };
+    const body = buildConfirmationEmailHtml({
+      bodyTemplate: settings?.email_body_template ?? null,
+      vars: emailVars,
+    });
     const { sent } = await sendConfirmationEmail({
       to: data.email,
       from: settings?.email_from ?? "careers@eurohull.com",
-      subject: renderTemplate(settings?.email_subject ?? "Application received", {
-        full_name: data.fullName,
-        job_title: job.title,
-      }),
+      subject: renderTemplate(settings?.email_subject ?? "Application received", emailVars),
       body,
     });
 

@@ -45,6 +45,24 @@ export type AdminSettings = {
   rate_limit_per_day: number;
 };
 
+export type SocialPostOutcome = {
+  network: string;
+  posted: boolean;
+  mocked: boolean;
+  error: string | null;
+};
+
+export type SocialPostRow = {
+  id: string;
+  job_listing_id: string | null;
+  job_title: string;
+  platform: string;
+  status: string;
+  post_url: string | null;
+  error_message: string | null;
+  created_at: string;
+};
+
 const jobSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().trim().min(2).max(150),
@@ -161,8 +179,17 @@ export const saveJob = createServerFn({ method: "POST" })
     }
 
     let socialPosted = false;
+    let socialResults: SocialPostOutcome[] = [];
     const becameActive = data.status === "active" && previousStatus !== "active";
     if (becameActive && data.social_auto_post) {
+      const { getRequest } = await import("@tanstack/react-start/server");
+      let origin: string | null = null;
+      try {
+        origin = new URL(getRequest().url).origin;
+      } catch {
+        origin = null;
+      }
+
       const { data: settings } = await supabaseAdmin
         .from("app_settings")
         .select("social_api_keys")
@@ -175,17 +202,25 @@ export const saveJob = createServerFn({ method: "POST" })
         .maybeSingle();
       const results = await postJobToSocials({
         title: data.title,
+        department: data.department,
         location: data.location,
-        url: `https://eurohull.com/jobs/${job?.slug ?? ""}`,
+        url: `${origin ?? "https://eurohull.com"}/jobs/${job?.slug ?? ""}`,
         keys: (settings?.social_api_keys ?? {}) as Record<string, string | undefined>,
+        origin,
       });
+      socialResults = results.map((result) => ({
+        network: result.network,
+        posted: result.posted,
+        mocked: result.mocked,
+        error: result.error ?? null,
+      }));
 
       await supabaseAdmin.from("social_posts").insert(
         results.map((result) => ({
           job_listing_id: jobId,
           platform: result.network,
           post_url: result.postUrl ?? null,
-          status: result.posted ? "success" : "failed",
+          status: result.mocked ? "mocked" : result.posted ? "success" : "failed",
           error_message: result.error ?? null,
         })),
       );
@@ -205,7 +240,7 @@ export const saveJob = createServerFn({ method: "POST" })
       socialPosted = results.some((result) => result.posted);
     }
 
-    return { ok: true as const, jobId, socialPosted };
+    return { ok: true as const, jobId, socialPosted, socialResults };
   });
 
 export const updateApplicationFlags = createServerFn({ method: "POST" })
@@ -370,3 +405,73 @@ export const latestApplications = createServerFn({ method: "GET" }).handler(asyn
     .limit(20);
   return { applications: data ?? [] };
 });
+
+/** Validates a stored social API token without publishing anything. */
+export const checkSocialConnection = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) =>
+    z.object({ network: z.enum(["linkedin", "facebook", "instagram"]) }).parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { requireAdmin } = await import("./admin-session.server");
+    await requireAdmin();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { testSocialConnection } = await import("./notifications.server");
+
+    const { data: settings } = await supabaseAdmin
+      .from("app_settings")
+      .select("social_api_keys")
+      .eq("id", true)
+      .maybeSingle();
+
+    const result = await testSocialConnection(
+      data.network,
+      (settings?.social_api_keys ?? {}) as Record<string, string | undefined>,
+    );
+    return { network: data.network, ...result };
+  });
+
+/** Social auto-post history, newest first, joined with the job title. */
+export const listSocialPosts = createServerFn({ method: "GET" }).handler(async () => {
+  const { requireAdmin } = await import("./admin-session.server");
+  await requireAdmin();
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  const [{ data: posts }, { data: jobs }] = await Promise.all([
+    supabaseAdmin
+      .from("social_posts")
+      .select("id, job_listing_id, platform, status, post_url, error_message, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200),
+    supabaseAdmin.from("job_listings").select("id, title"),
+  ]);
+
+  const titles = new Map((jobs ?? []).map((job) => [job.id, job.title]));
+  const rows: SocialPostRow[] = (posts ?? []).map((post) => ({
+    ...post,
+    job_title: post.job_listing_id ? (titles.get(post.job_listing_id) ?? "—") : "—",
+  }));
+  return { posts: rows };
+});
+
+/** Renders the confirmation email with sample data for the Settings preview. */
+export const previewConfirmationEmail = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) =>
+    z.object({ email_body_template: z.string().max(4000) }).parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { requireAdmin } = await import("./admin-session.server");
+    await requireAdmin();
+    const { buildConfirmationEmailHtml } = await import("./notifications.server");
+
+    const html = buildConfirmationEmailHtml({
+      bodyTemplate: data.email_body_template,
+      vars: {
+        full_name: "Μαρία Παπαδοπούλου",
+        job_title: "Naval Architect",
+        department: "Engineering",
+        location: "Piraeus, Greece",
+        date: new Date().toLocaleDateString("el-GR"),
+      },
+    });
+    return { html };
+  });
