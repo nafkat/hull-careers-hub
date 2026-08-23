@@ -16,6 +16,7 @@ import { ApplicationsPanel } from "@/components/admin/applications-panel";
 import { SettingsForm } from "@/components/admin/settings-form";
 import { SocialPostsPanel } from "@/components/admin/social-posts-panel";
 import { NauticalSpinner } from "@/components/nautical-spinner";
+import { SkeletonRows } from "@/components/skeleton-card";
 import { Rivets } from "@/components/industrial";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -168,8 +169,15 @@ function AdminConsole() {
 
   if (overview.isLoading || !overview.data) {
     return (
-      <div className="grid min-h-screen place-items-center">
-        <NauticalSpinner label="Loading dashboard" />
+      <div className="mx-auto w-full max-w-6xl px-5 py-10">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+          <div className="skeleton-plate h-[132px]" />
+          <div className="skeleton-plate h-[132px]" />
+          <div className="skeleton-plate h-[132px]" />
+        </div>
+        <div className="mt-10">
+          <SkeletonRows count={5} />
+        </div>
       </div>
     );
   }
@@ -193,14 +201,14 @@ function AdminConsole() {
         </div>
       </header>
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-3">
-        <StatCard icon={Inbox} label="Total applications" value={stats.total} />
-        <StatCard icon={CalendarRange} label="This month" value={stats.thisMonth} />
-        <StatCard icon={MailWarning} label="Unread" value={stats.unread} />
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <StatCard icon={Inbox} label="Total applications" value={stats.total} delay={0} />
+        <StatCard icon={CalendarRange} label="This month" value={stats.thisMonth} delay={100} />
+        <StatCard icon={MailWarning} label="Unread" value={stats.unread} delay={200} />
       </div>
 
       <Tabs defaultValue="jobs" className="mt-10">
-        <TabsList className="h-auto w-full justify-start gap-6 rounded-none border-b-2 border-steel/50 bg-transparent p-0">
+        <TabsList className="h-auto w-full justify-start gap-6 overflow-x-auto rounded-none border-b-2 border-steel/50 bg-transparent p-0">
           <TabsTrigger value="jobs" className="tab-steel px-1 pb-3">Jobs</TabsTrigger>
           <TabsTrigger value="applications" className="tab-steel px-1 pb-3">Applications</TabsTrigger>
           <TabsTrigger value="social" className="tab-steel px-1 pb-3">Social posts</TabsTrigger>
@@ -217,7 +225,7 @@ function AdminConsole() {
           </div>
           <div className="metal-plate relative overflow-x-auto">
             <Rivets />
-            <Table className="steel-table">
+            <Table className="steel-table min-w-[640px]">
 
               <TableHeader>
                 <TableRow>
@@ -313,15 +321,20 @@ function StatCard({
   icon: Icon,
   label,
   value,
+  delay = 0,
 }: {
   icon: typeof Inbox;
   label: string;
   value: number;
+  delay?: number;
 }) {
   return (
-    <div className="metal-plate plate-hover relative p-6">
+    <div
+      className="metal-plate plate-hover stagger-in relative p-6"
+      style={{ animationDelay: `${delay}ms` }}
+    >
       <Rivets />
-      <Icon className="size-5 text-primary" />
+      <Icon className="size-5 text-primary" aria-hidden />
       <p className="mt-4 font-display text-[40px] leading-none tracking-[2px]">{value}</p>
       <p className="mt-2 font-mono text-[11px] tracking-[2px] text-muted-foreground uppercase">
         {label}
