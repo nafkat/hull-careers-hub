@@ -201,9 +201,9 @@ export const updateApplicationFlags = createServerFn({ method: "POST" })
     const { requireAdmin } = await import("./admin-session.server");
     await requireAdmin();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: Record<string, boolean> = {};
-    if (data.is_read !== undefined) patch["is_read"] = data.is_read;
-    if (data.is_archived !== undefined) patch["is_archived"] = data.is_archived;
+    const patch: { is_read?: boolean; is_archived?: boolean } = {};
+    if (data.is_read !== undefined) patch.is_read = data.is_read;
+    if (data.is_archived !== undefined) patch.is_archived = data.is_archived;
     const { error } = await supabaseAdmin.from("applications").update(patch).eq("id", data.id);
     return { ok: !error };
   });
