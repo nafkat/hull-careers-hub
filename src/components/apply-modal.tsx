@@ -198,7 +198,7 @@ export function ApplyModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="metal-plate relative !max-w-full !rounded-none h-screen max-h-screen overflow-y-auto sm:!max-w-lg sm:!rounded-[4px] sm:h-auto sm:max-h-[90vh]">
+      <DialogContent className="metal-plate relative !top-0 !left-0 h-screen max-h-screen w-screen !max-w-full !translate-x-0 !translate-y-0 !rounded-none overflow-y-auto sm:!top-1/2 sm:!left-1/2 sm:h-auto sm:max-h-[90vh] sm:w-full sm:!max-w-lg sm:!-translate-x-1/2 sm:!-translate-y-1/2 sm:!rounded-[4px]">
         <Rivets />
         {stage === "success" ? (
           <SuccessScreen jobTitle={job.title} onClose={() => handleOpenChange(false)} />
