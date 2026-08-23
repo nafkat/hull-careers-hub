@@ -12,9 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
-import { Route as Char91sitemapXmlChar93RouteImport } from './routes/[sitemap.xml]'
 import { Route as ApiScanFileRouteImport } from './routes/api/scan-file'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsSlugRouteImport } from './routes/jobs.$slug'
@@ -35,6 +35,11 @@ const McpRoute = McpRouteImport.update({
   path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char91DotmcpChar93ListToolsRoute =
   Char91DotmcpChar93ListToolsRouteImport.update({
     id: '/.mcp/list-tools',
@@ -47,11 +52,6 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
-const Char91sitemapXmlChar93Route = Char91sitemapXmlChar93RouteImport.update({
-  id: '/[sitemap/xml]',
-  path: '/[sitemap/xml]',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiScanFileRoute = ApiScanFileRouteImport.update({
   id: '/api/scan-file',
   path: '/api/scan-file',
@@ -78,9 +78,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/mcp': typeof McpRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/[sitemap/xml]': typeof Char91sitemapXmlChar93Route
   '/api/scan-file': typeof ApiScanFileRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/jobs/': typeof JobsIndexRoute
@@ -90,9 +90,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/mcp': typeof McpRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/[sitemap/xml]': typeof Char91sitemapXmlChar93Route
   '/api/scan-file': typeof ApiScanFileRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/jobs': typeof JobsIndexRoute
@@ -103,9 +103,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/mcp': typeof McpRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/[sitemap/xml]': typeof Char91sitemapXmlChar93Route
   '/api/scan-file': typeof ApiScanFileRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/jobs/': typeof JobsIndexRoute
@@ -117,9 +117,9 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/mcp'
+    | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/[sitemap/xml]'
     | '/api/scan-file'
     | '/jobs/$slug'
     | '/jobs/'
@@ -129,9 +129,9 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/mcp'
+    | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/[sitemap/xml]'
     | '/api/scan-file'
     | '/jobs/$slug'
     | '/jobs'
@@ -141,9 +141,9 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/mcp'
+    | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/[sitemap/xml]'
     | '/api/scan-file'
     | '/jobs/$slug'
     | '/jobs/'
@@ -154,9 +154,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   McpRoute: typeof McpRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  Char91sitemapXmlChar93Route: typeof Char91sitemapXmlChar93Route
   ApiScanFileRoute: typeof ApiScanFileRoute
   JobsSlugRoute: typeof JobsSlugRoute
   JobsIndexRoute: typeof JobsIndexRoute
@@ -186,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.mcp/list-tools': {
       id: '/.mcp/list-tools'
       path: '/.mcp/list-tools'
@@ -198,13 +205,6 @@ declare module '@tanstack/react-router' {
       path: '/.well-known/oauth-protected-resource'
       fullPath: '/.well-known/oauth-protected-resource'
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/[sitemap/xml]': {
-      id: '/[sitemap/xml]'
-      path: '/[sitemap/xml]'
-      fullPath: '/[sitemap/xml]'
-      preLoaderRoute: typeof Char91sitemapXmlChar93RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/scan-file': {
@@ -242,10 +242,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   McpRoute: McpRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
-  Char91sitemapXmlChar93Route: Char91sitemapXmlChar93Route,
   ApiScanFileRoute: ApiScanFileRoute,
   JobsSlugRoute: JobsSlugRoute,
   JobsIndexRoute: JobsIndexRoute,
