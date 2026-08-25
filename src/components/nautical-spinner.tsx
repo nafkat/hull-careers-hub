@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 /**
  * Industrial loading indicator: a riveted steel ring with a rotating
@@ -11,12 +12,13 @@ export function NauticalSpinner({
   className?: string;
   label?: string;
 }) {
+  const { t } = useTranslation();
   const teeth = Array.from({ length: 12 }, (_, i) => i * 30);
   const rivets = [0, 90, 180, 270];
 
   return (
     <div className={cn("flex flex-col items-center gap-3", className)}>
-      <div className="relative size-12" role="status" aria-label={label ?? "Loading"}>
+      <div className="relative size-12" role="status" aria-label={label ?? t.loading}>
         {/* rotating gear rim */}
         <div className="absolute inset-0 animate-spin [animation-duration:3.2s]">
           {teeth.map((deg) => (

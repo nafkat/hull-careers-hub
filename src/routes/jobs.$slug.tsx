@@ -6,6 +6,8 @@ import { getActiveJob } from "@/lib/jobs.functions";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Rivets } from "@/components/industrial";
 import { ApplyModal } from "@/components/apply-modal";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { employmentTypeLabel } from "@/lib/i18n/translations";
 
 export const Route = createFileRoute("/jobs/$slug")({
   loader: async ({ params }) => {
@@ -69,13 +71,14 @@ export const Route = createFileRoute("/jobs/$slug")({
 });
 
 function JobNotFound() {
+  const { t } = useTranslation();
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="mx-auto flex max-w-6xl flex-1 flex-col items-center justify-center gap-4 px-5 text-center">
-        <h1 className="font-display text-3xl">This position is no longer listed</h1>
+        <h1 className="font-display text-3xl">{t.detail.notListed}</h1>
         <Link to="/jobs" className="text-gold underline-offset-4 hover:underline">
-          View all open roles
+          {t.detail.viewAllRoles}
         </Link>
       </main>
       <SiteFooter />
@@ -86,6 +89,7 @@ function JobNotFound() {
 function JobDetail() {
   const { job } = Route.useLoaderData();
   const [open, setOpen] = useState(false);
+  const { t, lang } = useTranslation();
   const accent = departmentAccent(job.department);
 
   return (
@@ -96,7 +100,7 @@ function JobDetail() {
           to="/jobs"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="size-4" /> All positions
+          <ArrowLeft className="size-4" /> {t.detail.backToPositions.replace("← ", "")}
         </Link>
 
         <div className="mt-8">
@@ -114,17 +118,17 @@ function JobDetail() {
             <MapPin className="size-4" /> {job.location}
           </span>
           <span className="inline-flex items-center gap-1.5 pr-5">
-            <Clock className="size-4" /> {job.employment_type}
+            <Clock className="size-4" /> {employmentTypeLabel(job.employment_type, lang)}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Building2 className="size-4" /> EUROHULL Shipyards
+            <Building2 className="size-4" /> {t.detail.company}
           </span>
         </div>
 
         <div className="metal-plate relative mt-10 space-y-8 p-8">
           <Rivets />
           <section className="space-y-4">
-            <h2 className="font-display text-2xl">About the role</h2>
+            <h2 className="font-display text-2xl">{t.detail.aboutRole}</h2>
             {job.description.split(/\n{2,}/).map((paragraph) => (
               <p key={paragraph} className="leading-relaxed text-muted-foreground">
                 {paragraph}
@@ -133,7 +137,7 @@ function JobDetail() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-2xl">What we're looking for</h2>
+            <h2 className="font-display text-2xl">{t.detail.requirements}</h2>
             <ul className="space-y-2 border-l-2 border-[#1E3A5F] pl-5">
               {job.requirements.map((requirement) => (
                 <li key={requirement} className="flex gap-3 text-muted-foreground">
@@ -151,7 +155,7 @@ function JobDetail() {
             style={{ borderRadius: 2 }}
           >
             <Rivets />
-            Apply now
+            {t.detail.applyNow}
           </button>
         </div>
 
