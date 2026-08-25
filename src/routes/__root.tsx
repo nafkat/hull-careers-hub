@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "EUROHULL Careers" },
-      { name: "description", content: "Careers at EUROHULL shipyards." },
+      { name: "description", content: "Καριέρα στα ναυπηγεία EUROHULL" },
       { name: "author", content: "EUROHULL" },
       { name: "theme-color", content: "#0B1F3A" },
       { property: "og:site_name", content: "EUROHULL Careers" },
@@ -116,7 +116,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="el">
       <head>
         <HeadContent />
       </head>
@@ -133,9 +133,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <Toaster position="top-center" />
+      <I18nProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <Toaster position="top-center" />
+      </I18nProvider>
     </QueryClientProvider>
   );
 }
