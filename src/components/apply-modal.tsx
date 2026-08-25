@@ -44,7 +44,7 @@ const applicationSchema = z.object({
 
 type Stage = "form" | "uploading" | "scanning" | "infected" | "success";
 type ScanResult = "clean" | "infected";
-type T = (typeof translations)["el"];
+type T = (typeof translations)[keyof typeof translations];
 
 function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
