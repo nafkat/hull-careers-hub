@@ -4,6 +4,7 @@ import { listActiveJobs } from "@/lib/jobs.functions";
 import { JobCard } from "@/components/job-card";
 import { Rivets, SparkBurst, YardAtmosphere } from "@/components/industrial";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 export const Route = createFileRoute("/")({
   loader: () => listActiveJobs(),
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Join EUROHULL shipyards in Greece. Open roles in naval architecture, hull production, marine design and yard operations.",
+          "Καριέρα στα ναυπηγεία EUROHULL. Ανοιχτές θέσεις σε ναυπηγική αρχιτεκτονική, παραγωγή, σχεδιασμό και λειτουργίες ναυπηγείου.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -33,22 +34,25 @@ export const Route = createFileRoute("/")({
 });
 
 function EmptyOpenings() {
+  const { t } = useTranslation();
   return (
     <div className="mt-10 flex flex-col items-center gap-3 py-16 text-center">
       <Anchor className="size-12 text-muted-foreground" aria-hidden />
-      <p className="text-muted-foreground">No positions currently open. Check back soon.</p>
+      <p className="font-display text-xl text-foreground">{t.jobs.emptyTitle}</p>
+      <p className="text-muted-foreground">{t.jobs.emptySubtitle}</p>
     </div>
   );
 }
 
-const pillars = [
-  { icon: Ship, title: "90m hulls", text: "Offshore support vessels built end-to-end in Elefsina." },
-  { icon: Waves, title: "Hybrid propulsion", text: "Electrifying the Aegean coastal fleet since 2019." },
-  { icon: Wrench, title: "1,400 crew", text: "Welders, architects, planners and designers in one yard." },
-];
-
-function Landing() {
+export function Landing() {
   const { jobs } = Route.useLoaderData();
+  const { t } = useTranslation();
+
+  const pillars = [
+    { icon: Ship, title: t.pillars.hulls.title, text: t.pillars.hulls.text },
+    { icon: Waves, title: t.pillars.propulsion.title, text: t.pillars.propulsion.text },
+    { icon: Wrench, title: t.pillars.crew.title, text: t.pillars.crew.text },
+  ];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -62,17 +66,16 @@ function Landing() {
         <YardAtmosphere />
         <div className="page-enter relative mx-auto w-full max-w-6xl px-5 py-24">
           <p className="font-mono text-[11px] tracking-[0.5em] text-fog uppercase">
-            Shipyards · Greece
+            {t.hero.eyebrow}
           </p>
           <h1 className="hero-title mt-6 text-[clamp(2.5rem,12vw,84px)] max-sm:tracking-[6px] text-foreground">
             EUROHULL
           </h1>
           <p className="mt-6 font-mono text-xs tracking-[4px] sm:tracking-[6px] text-primary uppercase">
-            Ideas that float
+            {t.hero.tagline}
           </p>
           <p className="mt-7 max-w-xl leading-relaxed text-muted-foreground">
-            We cut, weld and launch the vessels that keep Europe's coastlines moving. If you want
-            your work measured in tonnes and horizons, there's a berth for you here.
+            {t.hero.subTagline}
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-6">
             <Link
@@ -82,14 +85,14 @@ function Landing() {
             >
               <Rivets />
               <SparkBurst />
-              Join the yard
+              {t.hero.cta}
               <ArrowDown className="size-4 -rotate-90 text-primary" />
             </Link>
             <a
               href="#openings"
               className="font-mono text-[11px] tracking-[3px] text-muted-foreground uppercase transition-colors hover:text-foreground"
             >
-              Scroll to listings ↓
+              {t.hero.scrollIndicator} ↓
             </a>
           </div>
         </div>
@@ -116,11 +119,11 @@ function Landing() {
       <section id="openings" className="mx-auto w-full max-w-6xl scroll-mt-20 px-5 pb-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs tracking-[0.35em] text-gold uppercase">Now hiring</p>
-            <h2 className="mt-3 font-display text-4xl">Open positions</h2>
+            <p className="text-xs tracking-[0.35em] text-gold uppercase">{t.jobs.nowHiring}</p>
+            <h2 className="mt-3 font-display text-4xl">{t.jobs.title}</h2>
           </div>
           <Link to="/jobs" className="text-sm text-gold underline-offset-4 hover:underline">
-            View all {jobs.length} roles
+            {t.jobs.viewAll.replace("{count}", String(jobs.length))}
           </Link>
         </div>
 

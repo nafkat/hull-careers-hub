@@ -2,9 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { MapPin, Clock, ArrowUpRight } from "lucide-react";
 import { departmentAccent } from "@/data/departments";
 import { Rivets, SparkBurst } from "@/components/industrial";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { employmentTypeLabel } from "@/lib/i18n/translations";
 import type { PublicJob } from "@/lib/jobs.functions";
 
 export function JobCard({ job, index = 0 }: { job: PublicJob; index?: number }) {
+  const { lang } = useTranslation();
   const accent = departmentAccent(job.department);
 
   return (
@@ -40,7 +43,7 @@ export function JobCard({ job, index = 0 }: { job: PublicJob; index?: number }) 
           <MapPin className="size-3.5" /> {job.location}
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <Clock className="size-3.5" /> {job.employment_type}
+          <Clock className="size-3.5" /> {employmentTypeLabel(job.employment_type, lang)}
         </span>
       </div>
     </Link>
