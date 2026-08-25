@@ -25,6 +25,8 @@ import {
 import type { PublicJob } from "@/lib/jobs.functions";
 import { submitApplication } from "@/lib/applications.functions";
 import { Rivets } from "@/components/industrial";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { employmentTypeLabel, translations } from "@/lib/i18n/translations";
 import { cn } from "@/lib/utils";
 
 const MAX_FILE_MB = 10;
@@ -34,14 +36,15 @@ const ACCEPTED = [
 ];
 
 const applicationSchema = z.object({
-  fullName: z.string().trim().min(2, "Please enter your full name").max(100),
-  email: z.string().trim().email("Enter a valid email address").max(255),
+  fullName: z.string().trim().min(2).max(100),
+  email: z.string().trim().email().max(255),
   phone: z.string().trim().max(40).optional().or(z.literal("")),
-  coverMessage: z.string().trim().max(500, "Maximum 500 characters").optional().or(z.literal("")),
+  coverMessage: z.string().trim().max(500).optional().or(z.literal("")),
 });
 
 type Stage = "form" | "uploading" | "scanning" | "infected" | "success";
 type ScanResult = "clean" | "infected";
+type T = (typeof translations)["el"];
 
 function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -58,6 +61,14 @@ function toBase64(file: File) {
   });
 }
 
+/** Map a server-side error message to a localized string. */
+function localizeServerError(message: string, t: T): string {
+  if (message.includes("daily application limit")) return t.errors.dailyLimit;
+  if (message.includes("PDF and DOCX")) return t.errors.fileTypeInvalid;
+  if (message.includes("size")) return t.errors.fileTooLarge;
+  return t.errors.generic;
+}
+
 export function ApplyModal({
   job,
   open,
@@ -67,6 +78,7 @@ export function ApplyModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { t, lang } = useTranslation();
   const [stage, setStage] = useState<Stage>("form");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -104,11 +116,11 @@ export function ApplyModal({
     if (!candidate) return;
     const isDocx = candidate.name.toLowerCase().endsWith(".docx");
     if (!ACCEPTED.includes(candidate.type) && !isDocx) {
-      setFileError("Only PDF and DOCX files are accepted.");
+      setFileError(t.errors.fileTypeInvalid);
       return;
     }
     if (candidate.size > MAX_FILE_MB * 1024 * 1024) {
-      setFileError(`File is larger than ${MAX_FILE_MB} MB.`);
+      setFileError(t.errors.fileTooLarge);
       return;
     }
     setFileError(null);
@@ -123,10 +135,15 @@ export function ApplyModal({
     const nextErrors: Record<string, string> = {};
     if (!parsed.success) {
       for (const issue of parsed.error.issues) {
-        nextErrors[String(issue.path[0])] = issue.message;
+        const field = String(issue.path[0]);
+        if (field === "fullName") nextErrors[field] = t.errors.nameRequired;
+        else if (field === "email")
+          nextErrors[field] = email.trim() ? t.errors.emailInvalid : t.errors.emailRequired;
+        else if (field === "coverMessage") nextErrors[field] = t.apply.coverMessageHint;
+        else nextErrors[field] = t.errors.generic;
       }
     }
-    if (!file) setFileError("Please attach your CV (PDF or DOCX).");
+    if (!file) setFileError(t.errors.fileRequired);
     setErrors(nextErrors);
     if (!parsed.success || !file) return;
 
@@ -141,7 +158,7 @@ export function ApplyModal({
       base64 = await toBase64(file);
     } catch {
       clearInterval(ticker);
-      setFileError("We could not read that file. Please try again.");
+      setFileError(t.errors.generic);
       setStage("form");
       return;
     }
@@ -162,7 +179,7 @@ export function ApplyModal({
       });
     } catch {
       clearInterval(ticker);
-      setFileError("Submission failed. Please try again in a moment.");
+      setFileError(t.errors.generic);
       setStage("form");
       return;
     }
@@ -178,15 +195,13 @@ export function ApplyModal({
       return;
     }
     if (result.status === "scan-error") {
-      setFileError(
-        "We could not complete the virus scan. Your application was received and our team will review it manually.",
-      );
+      setFileError(t.errors.scanReview);
       setScanResult("clean");
       setStage("success");
       return;
     }
     if (result.status === "error") {
-      setFileError(result.message);
+      setFileError(localizeServerError(result.message, t));
       setStage("form");
       return;
     }
@@ -201,14 +216,13 @@ export function ApplyModal({
       <DialogContent className="metal-plate !fixed !top-0 !left-0 h-screen max-h-screen w-screen !max-w-full !translate-x-0 !translate-y-0 !rounded-none overflow-y-auto sm:!top-1/2 sm:!left-1/2 sm:h-auto sm:max-h-[90vh] sm:w-full sm:!max-w-lg sm:!-translate-x-1/2 sm:!-translate-y-1/2 sm:!rounded-[4px]">
         <Rivets />
         {stage === "success" ? (
-          <SuccessScreen jobTitle={job.title} onClose={() => handleOpenChange(false)} />
+          <SuccessScreen onClose={() => handleOpenChange(false)} />
         ) : stage === "infected" ? (
           <div className="page-enter flex flex-col items-center gap-4 py-8 text-center">
             <ShieldAlert className="size-12 text-destructive" />
-            <DialogTitle className="font-display text-2xl">Threat detected</DialogTitle>
+            <DialogTitle className="font-display text-2xl">{t.scan.infected}</DialogTitle>
             <DialogDescription className="max-w-sm text-muted-foreground">
-              Our scanner flagged this file and it has been quarantined. Your application was
-              not submitted. Please upload a clean PDF or DOCX.
+              {t.errors.scanInfected}
             </DialogDescription>
             <Button
               variant="outline"
@@ -218,14 +232,14 @@ export function ApplyModal({
                 setStage("form");
               }}
             >
-              Try another file
+              {t.apply.tryAnother}
             </Button>
           </div>
         ) : stage === "uploading" || stage === "scanning" ? (
           <div className="page-enter flex flex-col items-center gap-5 py-10 text-center">
             {stage === "uploading" ? (
               <>
-                <NauticalSpinner label="Uploading your CV" />
+                <NauticalSpinner label={t.apply.uploading} />
                 <div className="w-full max-w-xs">
                   <Progress value={progress} className="h-2" />
                   <p className="mt-2 text-xs text-muted-foreground">{progress}%</p>
@@ -239,9 +253,9 @@ export function ApplyModal({
                   <span className="absolute inset-0 animate-radar rounded-full [background:conic-gradient(from_0deg,color-mix(in_oklab,var(--poppy)_45%,transparent),transparent_90deg)]" />
                   <Shield className="relative size-10 text-primary" />
                 </div>
-                <p className="font-display text-xl tracking-[3px] uppercase">Scanning file…</p>
+                <p className="font-display text-xl tracking-[3px] uppercase">{t.scan.scanning}</p>
                 <p className="text-sm text-muted-foreground">
-                  Checking {file?.name} for threats.
+                  {t.scan.checking.replace("{file}", file?.name ?? "")}
                 </p>
               </>
             )}
@@ -249,20 +263,22 @@ export function ApplyModal({
         ) : (
           <form onSubmit={handleSubmit} className="page-enter space-y-5">
             <DialogHeader>
-              <DialogTitle className="font-display text-2xl">Apply — {job.title}</DialogTitle>
+              <DialogTitle className="font-display text-2xl">
+                {t.apply.title} — {job.title}
+              </DialogTitle>
               <DialogDescription>
-                {job.location} · {job.employment_type}
+                {job.location} · {employmentTypeLabel(job.employment_type, lang)}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-2">
-              <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="fullName">Full name *</Label>
+              <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="fullName">{t.apply.fullName} *</Label>
               <Input
                 id="fullName" className="h-11 min-h-[44px] rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                 value={fullName}
                 maxLength={100}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Maria Papadopoulou"
+                placeholder={t.apply.fullNamePlaceholder}
               />
               {errors["fullName"] && (
                 <p className="text-xs text-destructive">{errors["fullName"]}</p>
@@ -271,46 +287,48 @@ export function ApplyModal({
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="email">Email *</Label>
+                <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="email">{t.apply.email} *</Label>
                 <Input
                   id="email" className="h-11 min-h-[44px] rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                   type="email"
                   value={email}
                   maxLength={255}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t.apply.emailPlaceholder}
                 />
                 {errors["email"] && (
                   <p className="text-xs text-destructive">{errors["email"]}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="phone">Phone</Label>
+                <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="phone">{t.apply.phone}</Label>
                 <Input
                   id="phone" className="h-11 min-h-[44px] rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                   value={phone}
                   maxLength={40}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+30 ..."
+                  placeholder={t.apply.phonePlaceholder}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="cover">Cover message</Label>
+              <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground" htmlFor="cover">{t.apply.coverMessage}</Label>
               <Textarea
                 id="cover" className="rounded-none border-0 border-b-2 border-steel bg-transparent px-0 focus-visible:border-primary focus-visible:ring-0"
                 value={coverMessage}
                 maxLength={500}
                 rows={4}
                 onChange={(e) => setCoverMessage(e.target.value)}
-                placeholder="Tell us why you want to build ships with us."
+                placeholder={t.apply.coverMessagePlaceholder}
               />
-              <p className="text-right text-xs text-muted-foreground">{charsLeft} characters left</p>
+              <p className="text-right text-xs text-muted-foreground">
+                {charsLeft} {t.apply.charsLeft}
+              </p>
             </div>
 
             <div className="space-y-2">
-              <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground">CV / Resume *</Label>
+              <Label className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground">{t.apply.cvLabel} *</Label>
               {file ? (
                 <div className="flex items-center gap-3 rounded-[2px] border-2 border-steel bg-white/5 p-3">
                   <FileText className="size-5 text-primary" />
@@ -318,10 +336,10 @@ export function ApplyModal({
                     <p className="truncate text-sm">{file.name}</p>
                     <p className="text-xs text-muted-foreground">
                       {formatSize(file.size)}
-                      {verifying && " · Verifying file format…"}
+                      {verifying && ` · ${t.apply.verifying}`}
                     </p>
                     {file.size > 5 * 1024 * 1024 && (
-                      <p className="text-xs text-accent">Large file — upload may take a moment</p>
+                      <p className="text-xs text-accent">{t.apply.largeFile}</p>
                     )}
                   </div>
                   <Button
@@ -333,7 +351,7 @@ export function ApplyModal({
                       setVerifying(false);
                       setFileError(null);
                     }}
-                    aria-label="Remove file"
+                    aria-label={t.apply.removeFile}
                   >
                     <X className="size-4" />
                   </Button>
@@ -358,10 +376,8 @@ export function ApplyModal({
                   )}
                 >
                   <UploadCloud className="size-6 text-muted-foreground" />
-                  <span className="text-sm">Drag & drop your CV here, or click to browse</span>
-                  <span className="text-xs text-muted-foreground">
-                    PDF or DOCX · max {MAX_FILE_MB} MB
-                  </span>
+                  <span className="text-sm">{t.apply.fileUpload}</span>
+                  <span className="text-xs text-muted-foreground">{t.apply.fileTypes}</span>
                 </button>
               )}
               <input
@@ -381,11 +397,11 @@ export function ApplyModal({
               style={{ borderRadius: 2 }}
             >
               <Rivets />
-              {verifying ? "Verifying…" : "Submit application"}
+              {verifying ? t.apply.verifying : t.apply.submit}
             </button>
             {scanResult === "clean" && (
               <p className="flex items-center justify-center gap-1 text-xs text-success">
-                <ShieldCheck className="size-3.5" /> File verified
+                <ShieldCheck className="size-3.5" /> {t.scan.clean}
               </p>
             )}
           </form>
@@ -395,7 +411,8 @@ export function ApplyModal({
   );
 }
 
-function SuccessScreen({ jobTitle, onClose }: { jobTitle: string; onClose: () => void }) {
+function SuccessScreen({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="page-enter flex flex-col items-center gap-5 py-10 text-center">
       <div className="relative grid size-16 sm:size-20 place-items-center">
@@ -404,16 +421,16 @@ function SuccessScreen({ jobTitle, onClose }: { jobTitle: string; onClose: () =>
         <Anchor className="size-12 sm:size-9 animate-breathe text-primary drop-shadow-[0_0_18px_var(--poppy)]" />
       </div>
       <DialogTitle className="font-display text-3xl tracking-[3px] text-primary uppercase">
-        Application received
+        {t.apply.successTitle}
       </DialogTitle>
       <DialogDescription className="max-w-sm text-base text-muted-foreground">
-        We received your application for {jobTitle}. A confirmation email has been sent.
+        {t.apply.successMessage}
       </DialogDescription>
       <div className="flex items-center gap-1.5 text-xs text-success">
-        <ShieldCheck className="size-3.5" /> File scanned — clean
+        <ShieldCheck className="size-3.5" /> {t.scan.clean}
       </div>
       <Button variant="outline" onClick={onClose}>
-        Close
+        {t.apply.close}
       </Button>
     </div>
   );
