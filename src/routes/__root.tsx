@@ -13,8 +13,11 @@ import { Anchor } from "lucide-react";
 import appCss from "../styles.css?url";
 import { Toaster } from "../components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { I18nProvider } from "../lib/i18n/context";
+import { useTranslation } from "../lib/i18n/useTranslation";
 
 function NotFoundComponent() {
+  const { t } = useTranslation();
   return (
     <div className="grid-bg grid min-h-screen place-items-center px-5">
       <div className="page-enter flex max-w-md flex-col items-center text-center">
@@ -22,15 +25,15 @@ function NotFoundComponent() {
         <p className="font-display text-[clamp(72px,20vw,120px)] leading-none tracking-[6px] text-steel">
           404
         </p>
-        <h1 className="mt-2 font-display text-2xl tracking-[3px] text-foreground">Page not found</h1>
+        <h1 className="mt-2 font-display text-2xl tracking-[3px] text-foreground">{t.notFound.title}</h1>
         <p className="mt-3 text-muted-foreground">
-          This section of the yard is under construction.
+          {t.notFound.subtitle}
         </p>
         <Link
           to="/"
           className="mt-8 inline-flex min-h-[44px] items-center rounded-[2px] border-2 border-primary bg-card px-8 py-3 font-display text-sm tracking-[3px] text-foreground uppercase transition-colors hover:bg-primary/10"
         >
-          Return to dock
+          {t.notFound.cta}
         </Link>
       </div>
     </div>
